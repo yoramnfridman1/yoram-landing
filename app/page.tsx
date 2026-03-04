@@ -219,7 +219,7 @@ export default function YoramLandingPage() {
             className="h-16 w-auto mb-6 object-contain"
             variants={scaleIn}
           />
-          <motion.h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight max-w-3xl" variants={fadeUp}>
+          <motion.h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight max-w-3xl whitespace-pre-line" variants={fadeUp}>
             {c.heroHeadline}
           </motion.h1>
           <motion.p className="text-lg md:text-xl font-medium opacity-90 mb-2 max-w-2xl" variants={fadeUp}>
