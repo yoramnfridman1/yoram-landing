@@ -298,7 +298,7 @@ export default function YoramLandingPage() {
           {YORAM_CONFIG.stats.map((s, i) => (
             <div key={i}>
               <div style={{ fontSize:"3rem", fontWeight:800, color:"#f97316" }}>
-                {s.value.includes("%") ? statValues[i] + "%" : s.value.includes("+") ? "+" + statValues[i].toLocaleString() : statValues[i].toLocaleString()}
+                {statValues[i].toLocaleString()}{s.suffix}
               </div>
               <div style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", marginTop:"8px" }}>{s.label}</div>
             </div>
