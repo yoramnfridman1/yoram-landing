@@ -30,14 +30,11 @@ export const YORAM_CONFIG = {
   credentialsSubtitle: "סוכן ביטוח מורשה עם עשרות שנות ניסיון",
   ctaTitle: "רוצים לדעת כמה אתם יכולים לחסוך?",
   ctaSubtitle: "בדיקת תיק ביטוח חינם – בלי התחייבות",
-
-
   stats: [
     { value: 60, suffix: "%", label: "חיסכון ממוצע" },
     { value: 3500, suffix: "+", label: "משפחות שנבדקו" },
     { value: 25, suffix: "+", label: "שנות ניסיון" },
   ],
-
   steps: [
     { number: "שלב 1", title: "ממלאים טופס קצר", description: "שם וטלפון – זה הכל" },
     { number: "שלב 2", title: "שולחים תיק ביטוח", description: "שלחו לנו תמונות של הפוליסות הקיימות" },
@@ -45,20 +42,16 @@ export const YORAM_CONFIG = {
     { number: "שלב 4", title: "דוח השוואה", description: "נראה לכם בדיוק איפה אפשר לחסוך" },
     { number: "שלב 5", title: "חוסכים!", description: "מעבר חלק – בלי עלות, בלי התחייבות" },
   ],
-
   credentials: [
     { title: "סוכן מורשה", value: "רישיון משרד האוצר", icon: "🛡️" },
     { title: "25+ שנות ניסיון", value: "מאז 1999", icon: "🏆" },
     { title: "אובייקטיביות מלאה", value: "עובדים בשבילכם", icon: "🤝" },
     { title: "מתמחה במשכנתא", value: "60% חיסכון ממוצע", icon: "💰" },
   ],
-
-
   differentiators: [
     { icon: "shield", title: "ללא עלות", description: "הבדיקה חינם לגמרי. אם לא מתאים – אין חיוב." },
     { icon: "chart", title: "אובייקטיביות מלאה", description: "לא עובדים בשביל חברות ביטוח. עובדים בשבילכם." },
     { icon: "heart", title: "הכל במקום אחד", description: "משכנתא, ביטוח חיים, פנסיה, חיסכונות – הכל בידיים אחת." },
   ],
-
   complianceFooter: "יורם פרידמן – סוכן ביטוח מורשה | רישיון משרד האוצר",
 } as const;
