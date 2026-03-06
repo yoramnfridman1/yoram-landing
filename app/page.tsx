@@ -72,20 +72,6 @@ function isValidIsraeliPhone(p: string): boolean { const d = p.replace(/[\s\-()]
 
 /* ============ MAIN COMPONENT ============ */
 
-// Inline SVG Logo - YF brand gradient (no external image file needed)
-const YFLogo = ({ size = 44 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="yf-grad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#3b8fd4" />
-        <stop offset="100%" stopColor="#1a2b5e" />
-      </linearGradient>
-    </defs>
-    <rect width="44" height="44" rx="10" fill="url(#yf-grad)" />
-    <text x="22" y="30" textAnchor="middle" fill="white" fontSize="22" fontWeight="700" fontFamily="system-ui,-apple-system,sans-serif">YF</text>
-  </svg>
-);
-
 export default function YoramLandingPage() {
   const C = YORAM_CONFIG;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -137,7 +123,7 @@ export default function YoramLandingPage() {
       <nav style={{ position:"fixed", top:0, right:0, left:0, zIndex:40, transition:"all 0.4s ease", background: scrolled ? "rgba(10,22,40,0.92)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", WebkitBackdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(59,143,212,0.15)" : "none", boxShadow: scrolled ? "0 4px 30px rgba(0,0,0,0.3)" : "none" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"16px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <YFLogo size={44} />
+            <img src="/yf-logo.svg" alt="YF Logo" width={44} height={44} style={{ borderRadius: 8 }} />
             <span style={{ fontSize:18, fontWeight:700, background:"linear-gradient(135deg,#fff,#b8dcf5)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{C.businessName}</span>
           </div>
           {/* Desktop nav */}
@@ -337,7 +323,7 @@ export default function YoramLandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <YFLogo size={40} />
+              <img src="/yf-logo.svg" alt="YF Logo" width={40} height={40} style={{ borderRadius: 8 }} />
               <span className="text-white font-bold">{YORAM_CONFIG.businessName}</span>
             </div>
             <div className="flex items-center gap-6 text-blue-300/50 text-sm">
