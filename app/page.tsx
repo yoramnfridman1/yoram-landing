@@ -2,6 +2,26 @@
 import * as React from "react";
 import { YORAM_CONFIG } from "../lib/content";
 
+/* ── Helpers ── */
+function isValidIsraeliPhone(phone: string) {
+  const cleaned = phone.replace(/[\s\-]/g, "");
+  return /^(0[2-9]\d{7,8}|\+972[2-9]\d{7,8})$/.test(cleaned);
+}
+
+function smoothScroll(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function trackEvent(name: string, params?: Record<string, string>) {
+  try {
+    if (typeof window !== "undefined") {
+      if ((window as any).gtag) (window as any).gtag("event", name, params);
+      if ((window as any).fbq) (window as any).fbq("track", name, params);
+    }
+  } catch {}
+}
+
 /* ── Scroll-reveal hook ── */
 function useScrollReveal<T extends HTMLElement>(threshold = 0.05) {
   const ref = React.useRef<T>(null);
@@ -38,330 +58,295 @@ function useAnimatedCounter(end: number, duration: number, start: boolean) {
   }, [end, duration, start]);
   return val;
 }
-
-/* ── SVG Icons ── */
+/* ── SVG Icon Components ── */
 function ShieldIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-7 h-7">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     </svg>
   );
 }
 function ChartIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-7 h-7">
-      <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" />
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
     </svg>
   );
 }
 function HeartIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-7 h-7">
-      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
     </svg>
   );
 }
 function PhoneIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-7 h-7">
-      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
     </svg>
   );
 }
 function CheckCircleIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-emerald-500 flex-shrink-0">
-      <path d="M22 11.08V12a10 10 0 11-5.93-9.14" strokeLinecap="round" />
-      <path d="M22 4L12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
     </svg>
   );
 }
-
-const DIFF_ICONS: Record<string, React.ReactNode> = {
-  shield: <ShieldIcon />,
-  chart: <ChartIcon />,
-  heart: <HeartIcon />,
-};
+const DIFF_ICONS: Record<string, () => React.JSX.Element> = { shield: ShieldIcon, chart: ChartIcon, heart: HeartIcon };
 
 /* ── WhatsApp FAB ── */
 function WhatsAppFAB() {
-  const [expanded, setExpanded] = React.useState(false);
-  const waUrl = `https://wa.me/${YORAM_CONFIG.whatsapp}?text=${encodeURIComponent("\u05D4\u05D9\u05D9, \u05D0\u05E9\u05DE\u05D7 \u05DC\u05E7\u05D1\u05DC \u05D1\u05D3\u05D9\u05E7\u05EA \u05EA\u05D9\u05E7 \u05D1\u05D9\u05D8\u05D5\u05D7 \u05D7\u05D9\u05E0\u05DD")}`;
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex items-end gap-3" dir="ltr">
-      {expanded && (
-        <a href={waUrl} target="_blank" rel="noopener noreferrer"
-          className="bg-white text-gray-800 px-5 py-3 rounded-2xl shadow-xl text-sm font-medium
-                     animate-[fadeIn_0.2s_ease-out] hover:bg-gray-50 transition-colors whitespace-nowrap">
-          {"\u05E9\u05DC\u05D7\u05D5 \u05D4\u05D5\u05D3\u05E2\u05D4 \u05D1\u05D5\u05D5\u05D0\u05D8\u05E1\u05D0\u05E4 \u2709\uFE0F"}
-        </a>
-      )}
-      <button onClick={() => setExpanded(!expanded)}
-        className="w-14 h-14 rounded-full bg-[#25D366] text-white shadow-lg
-                   hover:scale-110 transition-transform flex items-center justify-center">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.3 0-4.438-.744-6.166-2.008l-.43-.322-2.65.888.888-2.65-.322-.43A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-        </svg>
-      </button>
-    </div>
+    <a href={`https://wa.me/${YORAM_CONFIG.whatsapp}`} target="_blank" rel="noopener noreferrer"
+      style={{ position:"fixed", bottom:"28px", left:"28px", zIndex:50, width:"64px", height:"64px", borderRadius:"50%", background:"#25D366", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 20px rgba(37,211,102,0.4)", transition:"transform 0.2s" }}
+      onMouseEnter={e=>(e.currentTarget.style.transform="scale(1.1)")} onMouseLeave={e=>(e.currentTarget.style.transform="scale(1)")}>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+    </a>
   );
 }
-
-/* ══════════════════════════════════════════════
-   MAIN PAGE COMPONENT
-   ══════════════════════════════════════════════ */
+/* ── Main Component ── */
 export default function YoramLandingPage() {
   const [formData, setFormData] = React.useState({ name: "", phone: "" });
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState(false);
+  const [phoneError, setPhoneError] = React.useState("");
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const msg = `\u05E9\u05DC\u05D5\u05DD, \u05E7\u05D5\u05E8\u05D0\u05D9\u05DD \u05DC\u05D9 ${formData.name}. \u05D0\u05E9\u05DE\u05D7 \u05DC\u05D1\u05D3\u05D9\u05E7\u05EA \u05EA\u05D9\u05E7 \u05D1\u05D9\u05D8\u05D5\u05D7 \u05D7\u05D9\u05E0\u05DD. \u05D8\u05DC\u05E4\u05D5\u05DF: ${formData.phone}`;
+    setPhoneError("");
+    if (!formData.name.trim()) return;
+    if (!isValidIsraeliPhone(formData.phone)) {
+      setPhoneError("מספר טלפון לא תקין");
+      return;
+    }
+    trackEvent("lead_submit", { name: formData.name });
+    try {
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: formData.name, phone: formData.phone, source: "hero_form" }),
+      }).catch(() => {});
+    } catch {}
+    setSubmitted(true);
+    const msg = `שלום, קוראים לי ${formData.name}. אשמח לבדיקת תיק ביטוח חינם. טלפון: ${formData.phone}`;
     window.open(`https://wa.me/${YORAM_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  /* Scroll-reveal refs */
-  const stepsSection = useScrollReveal<HTMLElement>(0.1);
-  const diffSection = useScrollReveal<HTMLElement>(0.1);
-  const statsSection = useScrollReveal<HTMLElement>(0.15);
-  const credSection = useScrollReveal<HTMLElement>(0.1);
-  const ctaSection = useScrollReveal<HTMLElement>(0.15);
+  const stepsRef = useScrollReveal<HTMLElement>();
+  const diffRef = useScrollReveal<HTMLElement>();
+  const statsRef = useScrollReveal<HTMLElement>();
+  const credRef = useScrollReveal<HTMLElement>();
 
-  const stat0 = useAnimatedCounter(YORAM_CONFIG.stats[0].value, 1800, statsSection.isVisible);
-  const stat1 = useAnimatedCounter(YORAM_CONFIG.stats[1].value, 2200, statsSection.isVisible);
-  const stat2 = useAnimatedCounter(YORAM_CONFIG.stats[2].value, 1400, statsSection.isVisible);
-  const statVals = [stat0, stat1, stat2];
+  const stat0 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[0].value), stepsRef.inView);
+  const stat1 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[1].value.replace(/[+,]/g, "")), stepsRef.inView);
+  const stat2 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[2].value.replace(/[+]/g, "")), stepsRef.inView);
+  const statValues = [stat0, stat1, stat2];
 
+  const navItems = [
+    { label: "איך זה עובד?", id: "steps" },
+    { label: "למה דרכנו?", id: "why" },
+    { label: "ניסיון", id: "credentials" },
+  ];
   return (
-    <div className="min-h-screen bg-white text-gray-900" dir="rtl">
-
-      {/* ── NAVBAR ── */}
-      <nav className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
-        scrolled ? "bg-[#1a2a5e]/95 backdrop-blur-md shadow-lg" : "bg-transparent"
-      }`}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-              <span className="text-[#1a2a5e] font-bold text-lg" style={{ fontFamily: "Georgia, serif" }}>YF</span>
-            </div>
-            <span className="text-white font-semibold text-sm hidden sm:block">
-              {"\u05D9\u05D5\u05E8\u05DD \u05E4\u05E8\u05D9\u05D3\u05DE\u05DF \u05D1\u05D9\u05D8\u05D5\u05D7"}
-            </span>
+    <main className="min-h-screen" style={{ background: "#f8f9fa", direction: "rtl" }}>
+      {/* ── Navbar ── */}
+      <nav style={{ position:"fixed", top:0, right:0, left:0, zIndex:40, transition:"all 0.3s", background: scrolled ? "rgba(26,42,94,0.97)" : "transparent", backdropFilter: scrolled ? "blur(8px)" : "none", boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.15)" : "none" }}>
+        <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"16px 24px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
+            <div style={{ width:"44px", height:"44px", borderRadius:"10px", background:"linear-gradient(135deg,#1a2a5e,#2b6cb0)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:900, fontSize:"1.1rem" }}>YF</div>
+            <span style={{ color:"white", fontWeight:700, fontSize:"1.1rem" }}>{YORAM_CONFIG.businessName}</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-white/90 text-sm font-medium">
-            <a href="#steps" className="hover:text-white transition-colors">{"\u05D0\u05D9\u05DA \u05D6\u05D4 \u05E2\u05D5\u05D1\u05D3?"}</a>
-            <a href="#why" className="hover:text-white transition-colors">{"\u05DC\u05DE\u05D4 \u05D3\u05E8\u05DB\u05E0\u05D5?"}</a>
-            <a href="#credentials" className="hover:text-white transition-colors">{"\u05E0\u05D9\u05E1\u05D9\u05D5\u05DF"}</a>
-            <a href={`tel:${YORAM_CONFIG.phone}`} className="bg-[#f97316] text-white px-4 py-2 rounded-lg hover:bg-[#ea580c] transition-colors">
-              <span className="flex items-center gap-2">
-                <PhoneIcon />
-                {YORAM_CONFIG.phone}
-              </span>
+          <div className="hidden md:flex" style={{ gap:"32px", alignItems:"center" }}>
+            {navItems.map(n => (
+              <a key={n.id} href={`#${n.id}`} onClick={(e) => { e.preventDefault(); smoothScroll(n.id); }} style={{ color:"rgba(255,255,255,0.85)", fontSize:"0.95rem", textDecoration:"none", transition:"color 0.2s" }}
+                onMouseEnter={e=>e.currentTarget.style.color="#f97316"} onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.85)"}>{n.label}</a>
+            ))}
+            <a href={`tel:${YORAM_CONFIG.phone}`} style={{ background:"#f97316", color:"white", padding:"10px 24px", borderRadius:"8px", fontWeight:700, fontSize:"0.9rem", textDecoration:"none", display:"flex", alignItems:"center", gap:"8px" }}>
+              <PhoneIcon />{YORAM_CONFIG.phone}
             </a>
           </div>
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-white p-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
-              {menuOpen
-                ? <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
-                : <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />}
-            </svg>
+          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ color:"white", background:"none", border:"none", fontSize:"1.5rem", cursor:"pointer" }}>
+            {menuOpen ? "✕" : "☰"}
           </button>
         </div>
         {menuOpen && (
-          <div className="md:hidden bg-[#1a2a5e]/95 backdrop-blur-md border-t border-white/10 px-6 py-4 space-y-3">
-            <a href="#steps" onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-white py-2">{"\u05D0\u05D9\u05DA \u05D6\u05D4 \u05E2\u05D5\u05D1\u05D3?"}</a>
-            <a href="#why" onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-white py-2">{"\u05DC\u05DE\u05D4 \u05D3\u05E8\u05DB\u05E0\u05D5?"}</a>
-            <a href="#credentials" onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-white py-2">{"\u05E0\u05D9\u05E1\u05D9\u05D5\u05DF"}</a>
-            <a href={`tel:${YORAM_CONFIG.phone}`} className="block bg-[#f97316] text-white text-center px-4 py-2 rounded-lg">
-              {YORAM_CONFIG.phone}
-            </a>
+          <div className="md:hidden" style={{ background:"rgba(26,42,94,0.98)", padding:"16px 24px", borderTop:"1px solid rgba(255,255,255,0.1)" }}>
+            {navItems.map(n => (
+              <a key={n.id} href={`#${n.id}`} onClick={(e) => { e.preventDefault(); smoothScroll(n.id); setMenuOpen(false); }} style={{ display:"block", padding:"12px 0", color:"rgba(255,255,255,0.85)", textDecoration:"none", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>{n.label}</a>
+            ))}
+            <a href={`tel:${YORAM_CONFIG.phone}`} style={{ display:"block", marginTop:"12px", background:"#f97316", color:"white", padding:"12px", borderRadius:"8px", fontWeight:700, textAlign:"center", textDecoration:"none" }}>{YORAM_CONFIG.phone}</a>
           </div>
         )}
       </nav>
-
-      {/* ── HERO ── */}
-      <section className="relative min-h-[92vh] flex items-center bg-gradient-to-br from-[#1a2a5e] via-[#1e3470] to-[#2b6cb0] pt-16 overflow-hidden">
-        {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-          backgroundSize: "40px 40px"
-        }} />
-
-        <div className="relative max-w-6xl mx-auto px-6 w-full grid md:grid-cols-2 gap-12 items-center py-12">
-          {/* Right side - Text (RTL) */}
-          <div className="text-white space-y-6">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight" style={{ fontFamily: "Georgia, serif" }}>
-              {"\u05DE\u05E9\u05DC\u05DE\u05D9\u05DD \u05D9\u05D5\u05EA\u05E8 \u05DE\u05D3\u05D9?"}
-              <br />
-              <span className="text-[#f97316]">{"\u05D6\u05D4 \u05D4\u05D6\u05DE\u05DF \u05DC\u05D1\u05D3\u05D5\u05E7."}</span>
+      {/* ── Hero ── */}
+      <section style={{ position:"relative", minHeight:"100vh", background:"linear-gradient(135deg,#1a2a5e 0%,#1e3a6e 50%,#2b6cb0 100%)", display:"flex", alignItems:"center", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, opacity:0.06 }}>
+          <div style={{ position:"absolute", top:"-10%", right:"-10%", width:"600px", height:"600px", borderRadius:"50%", background:"radial-gradient(circle,#2b6cb0,transparent 70%)" }}/>
+          <div style={{ position:"absolute", bottom:"-20%", left:"-10%", width:"800px", height:"800px", borderRadius:"50%", background:"radial-gradient(circle,#1a2a5e,transparent 70%)" }}/>
+        </div>
+        <div style={{ position:"relative", zIndex:1, maxWidth:"1200px", margin:"0 auto", padding:"140px 24px 80px", display:"grid", gridTemplateColumns:"1fr", gap:"48px", width:"100%" }} className="md:!grid-cols-2">
+          <div style={{ display:"flex", flexDirection:"column", justifyContent:"center" }}>
+            <h1 style={{ fontFamily:"Georgia, serif", fontSize:"clamp(2rem,5vw,3.2rem)", fontWeight:700, color:"white", lineHeight:1.2, marginBottom:"24px" }}>
+              {YORAM_CONFIG.heroHeadline.split("60%").map((part, i, arr) => i < arr.length - 1 ? <React.Fragment key={i}>{part}<span style={{ color:"#f97316" }}>60%</span></React.Fragment> : part)}
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 max-w-lg leading-relaxed">
-              {YORAM_CONFIG.heroSubheadline}
-            </p>
-            <div className="flex flex-wrap gap-4 text-sm text-white/70">
-              <span className="flex items-center gap-2"><CheckCircleIcon /> {"\u05DC\u05DC\u05D0 \u05E2\u05DC\u05D5\u05EA"}</span>
-              <span className="flex items-center gap-2"><CheckCircleIcon /> {"\u05DC\u05DC\u05D0 \u05D4\u05EA\u05D7\u05D9\u05D9\u05D1\u05D5\u05EA"}</span>
-              <span className="flex items-center gap-2"><CheckCircleIcon /> {"25+ \u05E9\u05E0\u05D5\u05EA \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF"}</span>
+            <p style={{ fontSize:"1.2rem", color:"rgba(255,255,255,0.8)", marginBottom:"32px", maxWidth:"500px" }}>{YORAM_CONFIG.heroSubheadline}</p>
+            <div style={{ display:"flex", gap:"16px", flexWrap:"wrap" }}>
+              <a href={`https://wa.me/${YORAM_CONFIG.whatsapp}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("hero_whatsapp_click")}
+                style={{ background:"#25D366", color:"white", padding:"16px 32px", borderRadius:"12px", fontWeight:700, fontSize:"1.1rem", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:"10px", transition:"transform 0.2s" }}
+                onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+              </a>
+              <a href={`tel:${YORAM_CONFIG.phone}`} onClick={() => trackEvent("hero_phone_click")}
+                style={{ border:"2px solid rgba(255,255,255,0.3)", color:"white", padding:"16px 32px", borderRadius:"12px", fontWeight:700, fontSize:"1.1rem", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:"10px", transition:"all 0.2s" }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="white";e.currentTarget.style.transform="translateY(-2px)"}} onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.3)";e.currentTarget.style.transform="translateY(0)"}}>
+                <PhoneIcon />{YORAM_CONFIG.phone}
+              </a>
             </div>
           </div>
-
-          {/* Left side - Form card */}
-          <div className="bg-white rounded-2xl shadow-2xl p-8 text-gray-900">
-            <h2 className="text-2xl font-bold mb-2 text-[#1a2a5e]" style={{ fontFamily: "Georgia, serif" }}>
-              {"\u05D1\u05D3\u05D9\u05E7\u05EA \u05EA\u05D9\u05E7 \u05D7\u05D9\u05E0\u05DD"}
-            </h2>
-            <p className="text-gray-500 text-sm mb-6">{"\u05DE\u05DC\u05D0\u05D5 \u05E4\u05E8\u05D8\u05D9\u05DD \u05D5\u05E0\u05D7\u05D6\u05D5\u05E8 \u05D0\u05DC\u05D9\u05DB\u05DD \u05EA\u05D5\u05DA 24 \u05E9\u05E2\u05D5\u05EA"}</p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{"\u05E9\u05DD \u05DE\u05DC\u05D0"}</label>
-                <input type="text" required placeholder={"\u05D9\u05D5\u05E8\u05DD \u05D9\u05E9\u05E8\u05D0\u05DC\u05D9"}
-                  value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-[#2b6cb0] focus:border-transparent outline-none transition-all text-gray-900" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{"\u05D8\u05DC\u05E4\u05D5\u05DF"}</label>
-                <input type="tel" required placeholder="050-000-0000" dir="ltr"
-                  value={formData.phone} onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-[#2b6cb0] focus:border-transparent outline-none transition-all text-gray-900" />
-              </div>
-              <button type="submit"
-                className="w-full py-4 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white font-bold text-lg
-                           shadow-lg shadow-orange-500/25 transition-all hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98]">
-                {YORAM_CONFIG.ctaText}
-              </button>
-            </form>
-            <p className="text-center text-xs text-gray-400 mt-4">{"\u05DC\u05D0 \u05E1\u05E4\u05DD \u2022 \u05D0\u05D5\u05D1\u05D9\u05D9\u05E7\u05D8\u05D9\u05D1\u05D9\u05D5\u05EA \u05DE\u05DC\u05D0\u05D4"}</p>
-          </div>
-        </div>
-
-        {/* Wave divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" className="w-full">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z" fill="white"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* ── STEPS SECTION ── */}
-      <section id="steps" ref={stepsSection.ref}
-        className="py-20 bg-white" style={{ opacity: stepsSection.isVisible ? 1 : 0, transform: stepsSection.isVisible ? 'none' : 'translateY(32px)', transition: 'all 0.7s ease-out' }}>
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a2a5e] mb-4" style={{ fontFamily: "Georgia, serif" }}>
-            {"\u05D0\u05D9\u05DA \u05D6\u05D4 \u05E2\u05D5\u05D1\u05D3?"}
-          </h2>
-          <p className="text-center text-gray-500 mb-14 max-w-xl mx-auto">
-            {"\u05EA\u05D4\u05DC\u05D9\u05DA \u05E4\u05E9\u05D5\u05D8 \u05D1-5 \u05E6\u05E2\u05D3\u05D9\u05DD \u2013 \u05D0\u05E0\u05D7\u05E0\u05D5 \u05E2\u05D5\u05E9\u05D9\u05DD \u05D0\u05EA \u05D4\u05E2\u05D1\u05D5\u05D3\u05D4"}
-          </p>
-          <div className="grid sm:grid-cols-5 gap-6">
-            {YORAM_CONFIG.steps.map((step, i) => (
-              <div key={i} className="text-center group" style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1a2a5e] to-[#2b6cb0] text-white flex items-center justify-center mx-auto mb-4
-                               text-xl font-bold shadow-lg group-hover:scale-110 transition-transform">
-                  {i + 1}
+          {/* Form Card */}
+          <div className="hidden md:flex" style={{ justifyContent:"center", alignItems:"center" }}>
+            <div style={{ background:"white", borderRadius:"20px", padding:"40px", boxShadow:"0 25px 60px rgba(0,0,0,0.2)", maxWidth:"420px", width:"100%" }}>
+              {submitted ? (
+                <div style={{ textAlign:"center", padding:"20px 0" }}>
+                  <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:"#22c55e", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px" }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <h3 style={{ fontSize:"1.5rem", fontWeight:700, color:"#1a2a5e", marginBottom:"8px" }}>תודה!</h3>
+                  <p style={{ color:"#666", marginBottom:"20px" }}>נחזור אליך תוך 24 שעות</p>
+                  <a href={`https://wa.me/${YORAM_CONFIG.whatsapp}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display:"inline-flex", alignItems:"center", gap:"8px", color:"#25D366", fontWeight:700, textDecoration:"none" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    או דברו איתנו ישירות בוואטסאפ
+                  </a>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1 text-sm">{step.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{step.description}</p>
-              </div>
-            ))}
+              ) : (
+                <>
+                  <h3 style={{ fontSize:"1.4rem", fontWeight:700, color:"#1a2a5e", marginBottom:"4px" }}>{YORAM_CONFIG.ctaText}</h3>
+                  <p style={{ color:"#888", fontSize:"0.9rem", marginBottom:"24px" }}>ללא התחייבות • 100% חינם</p>
+                  <form onSubmit={handleSubmit}>
+                    <input type="text" placeholder="שם מלא" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required
+                      style={{ width:"100%", padding:"14px 16px", borderRadius:"10px", border:"2px solid #e5e7eb", fontSize:"1rem", marginBottom:"12px", outline:"none", transition:"border-color 0.2s" }}
+                      onFocus={e=>e.currentTarget.style.borderColor="#2b6cb0"} onBlur={e=>e.currentTarget.style.borderColor="#e5e7eb"} />
+                    <div>
+                      <input type="tel" placeholder="טלפון" value={formData.phone} onChange={e => { setFormData({ ...formData, phone: e.target.value }); setPhoneError(""); }} required
+                        style={{ width:"100%", padding:"14px 16px", borderRadius:"10px", border:`2px solid ${phoneError ? "#ef4444" : "#e5e7eb"}`, fontSize:"1rem", outline:"none", transition:"border-color 0.2s" }}
+                        onFocus={e=>e.currentTarget.style.borderColor=phoneError?"#ef4444":"#2b6cb0"} onBlur={e=>e.currentTarget.style.borderColor=phoneError?"#ef4444":"#e5e7eb"} />
+                      {phoneError && <p style={{ color:"#ef4444", fontSize:"0.8rem", marginTop:"4px" }}>{phoneError}</p>}
+                    </div>
+                    <button type="submit"
+                      style={{ width:"100%", marginTop:"12px", padding:"16px", borderRadius:"10px", background:"#f97316", color:"white", fontWeight:800, fontSize:"1.1rem", border:"none", cursor:"pointer", transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:"8px" }}
+                      onMouseEnter={e=>e.currentTarget.style.background="#ea580c"} onMouseLeave={e=>e.currentTarget.style.background="#f97316"}>
+                      <CheckCircleIcon />{YORAM_CONFIG.ctaText}
+                    </button>
+                  </form>
+                  <p style={{ textAlign:"center", marginTop:"16px", fontSize:"0.78rem", color:"#aaa" }}>🔒 המידע שלך מאובטח ולא יועבר לגורם שלישי</p>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* ── WHY US (DIFFERENTIATORS) ── */}
-      <section id="why" ref={diffSection.ref}
-        className="py-20 bg-gray-50" style={{ opacity: diffSection.isVisible ? 1 : 0, transform: diffSection.isVisible ? 'none' : 'translateY(32px)', transition: 'all 0.7s ease-out' }}>
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a2a5e] mb-4" style={{ fontFamily: "Georgia, serif" }}>
-            {"\u05DC\u05DE\u05D4 \u05D3\u05E8\u05DB\u05E0\u05D5?"}
-          </h2>
-          <p className="text-center text-gray-500 mb-14 max-w-xl mx-auto">
-            {"\u05D9\u05D5\u05E8\u05DD \u05E4\u05E8\u05D9\u05D3\u05DE\u05DF \u2013 \u05E1\u05D5\u05DB\u05DF \u05D1\u05D9\u05D8\u05D5\u05D7 \u05DE\u05D5\u05E8\u05E9\u05D4 \u05E2\u05DD 25+ \u05E9\u05E0\u05D5\u05EA \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF"}
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {YORAM_CONFIG.differentiators.map((diff, i) => (
-              <div key={i}
-                className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#2b6cb0]/30 transition-all group"
-                style={{ transitionDelay: `${i * 150}ms` }}>
-                <div className="w-14 h-14 rounded-xl bg-[#1a2a5e]/10 text-[#1a2a5e] flex items-center justify-center mb-5 group-hover:bg-[#1a2a5e] group-hover:text-white transition-colors">
-                  {DIFF_ICONS[diff.icon] || <ShieldIcon />}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{diff.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{diff.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── STATS SECTION ── */}
-      <section ref={statsSection.ref}
-        className="py-16 bg-gradient-to-r from-[#1a2a5e] to-[#2b6cb0]" style={{ opacity: statsSection.isVisible ? 1 : 0, transform: statsSection.isVisible ? 'none' : 'translateY(32px)', transition: 'all 0.7s ease-out' }}>
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-3 gap-8 text-center text-white">
-          {YORAM_CONFIG.stats.map((stat, i) => (
-            <div key={i}>
-              <div className="text-4xl sm:text-5xl font-bold mb-2" style={{ fontFamily: "Georgia, serif" }}>
-                {statVals[i]}{stat.suffix}
-              </div>
-              <div className="text-white/70 text-sm">{stat.label}</div>
+      {/* ── Steps ── */}
+      <section id="steps" ref={stepsRef.ref} style={{ padding:"100px 24px", maxWidth:"1200px", margin:"0 auto", opacity: stepsRef.inView ? 1 : 0, transform: stepsRef.inView ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
+        <h2 style={{ textAlign:"center", fontSize:"2rem", fontWeight:700, color:"#1a2a5e", marginBottom:"60px" }}>איך זה עובד?</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap:"32px" }}>
+          {YORAM_CONFIG.steps.map((s, i) => (
+            <div key={i} style={{ textAlign:"center" }}>
+              <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:"linear-gradient(135deg,#1a2a5e,#2b6cb0)", color:"white", fontWeight:800, fontSize:"1.4rem", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", boxShadow:"0 4px 15px rgba(26,42,94,0.25)" }}>{i + 1}</div>
+              <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"6px" }}>{s.title}</h3>
+              <p style={{ color:"#666", fontSize:"0.9rem" }}>{s.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── CREDENTIALS SECTION ── */}
-      <section id="credentials" ref={credSection.ref}
-        className="py-20 bg-white" style={{ opacity: credSection.isVisible ? 1 : 0, transform: credSection.isVisible ? 'none' : 'translateY(32px)', transition: 'all 0.7s ease-out' }}>
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a2a5e] mb-14" style={{ fontFamily: "Georgia, serif" }}>
-            {"\u05E0\u05D9\u05E1\u05D9\u05D5\u05DF \u05D5\u05D0\u05DE\u05D9\u05E0\u05D5\u05EA"}
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {YORAM_CONFIG.credentials.map((cred, i) => (
-              <div key={i}
-                className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100 hover:border-[#2b6cb0]/30 hover:shadow-md transition-all"
-                style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className="text-4xl mb-4">{cred.icon}</div>
-                <h3 className="font-bold text-gray-900 mb-1">{cred.title}</h3>
-                <p className="text-sm text-gray-500">{cred.value}</p>
-              </div>
-            ))}
+      {/* ── Differentiators ── */}
+      <section id="why" ref={diffRef.ref} style={{ padding:"80px 24px", background:"white", opacity: diffRef.inView ? 1 : 0, transform: diffRef.inView ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
+        <div style={{ maxWidth:"1200px", margin:"0 auto" }}>
+          <h2 style={{ textAlign:"center", fontSize:"2rem", fontWeight:700, color:"#1a2a5e", marginBottom:"60px" }}>למה דרכנו?</h2>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:"32px" }}>
+            {YORAM_CONFIG.differentiators.map((d, i) => {
+              const Icon = DIFF_ICONS[d.icon] || ShieldIcon;
+              return (
+                <div key={i} style={{ background:"#f8f9fa", borderRadius:"16px", padding:"36px", textAlign:"center", transition:"transform 0.3s, box-shadow 0.3s", cursor:"default" }}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 8px 30px rgba(0,0,0,0.08)"}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none"}}>
+                  <div style={{ display:"flex", justifyContent:"center", marginBottom:"16px" }}><Icon /></div>
+                  <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"8px", fontSize:"1.15rem" }}>{d.title}</h3>
+                  <p style={{ color:"#666", fontSize:"0.92rem", lineHeight:1.7 }}>{d.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
+      {/* ── Stats ── */}
+      <section ref={statsRef.ref} style={{ padding:"80px 24px", background:"linear-gradient(135deg,#1a2a5e,#2b6cb0)", opacity: statsRef.inView ? 1 : 0, transform: statsRef.inView ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
+        <div style={{ maxWidth:"900px", margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:"32px", textAlign:"center" }}>
+          {YORAM_CONFIG.stats.map((s, i) => (
+            <div key={i}>
+              <div style={{ fontSize:"3rem", fontWeight:800, color:"#f97316" }}>
+                {s.value.includes("%") ? statValues[i] + "%" : s.value.includes("+") ? "+" + statValues[i].toLocaleString() : statValues[i].toLocaleString()}
+              </div>
+              <div style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", marginTop:"8px" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-
+      {/* ── Credentials ── */}
+      <section id="credentials" ref={credRef.ref} style={{ padding:"100px 24px", maxWidth:"1200px", margin:"0 auto", opacity: credRef.inView ? 1 : 0, transform: credRef.inView ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
+        <h2 style={{ textAlign:"center", fontSize:"2rem", fontWeight:700, color:"#1a2a5e", marginBottom:"60px" }}>ניסיון ואמינות</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px, 1fr))", gap:"24px" }}>
+          {YORAM_CONFIG.credentials.map((c, i) => (
+            <div key={i} style={{ background:"white", borderRadius:"16px", padding:"32px", textAlign:"center", boxShadow:"0 2px 12px rgba(0,0,0,0.05)", border:"1px solid #eee", transition:"transform 0.3s" }}
+              onMouseEnter={e=>e.currentTarget.style.transform="translateY(-4px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+              <div style={{ fontSize:"2.5rem", marginBottom:"12px" }}>{c.icon}</div>
+              <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"6px" }}>{c.title}</h3>
+              <p style={{ color:"#666", fontSize:"0.9rem" }}>{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* ── CTA Section ── */}
-      <section className="relative py-24 overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a2a5e 0%, #2b4a8e 50%, #1a2a5e 100%)' }}>
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-            {"הגיע הזמן לבדוק את התיק שלך"}
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #1a2a5e 0%, #2b6cb0 100%)" }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)" }} />
+        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Georgia, serif" }}>
+            {YORAM_CONFIG.heroHeadline.split("60%")[0]}
+            <span style={{ color: "#f97316" }}>60%</span>
+            {YORAM_CONFIG.heroHeadline.split("60%")[1] || ""}
           </h2>
-          <p className="text-xl text-blue-200 mb-8">
-            {"בדיקה חינם ללא התחייבות — תוך 5 דקות תדעו אם אתם משלמים יותר מדי"}
-          </p>
+          <p className="text-lg text-blue-100 mb-8">{YORAM_CONFIG.heroSubheadline}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href={`https://wa.me/${YORAM_CONFIG.whatsapp}?text=${encodeURIComponent('היי, אשמח לבדיקת תיק ביטוח חינם')}`}
+              href={`https://wa.me/${YORAM_CONFIG.whatsapp}?text=${encodeURIComponent("שלום, אשמח לבדיקת תיק ביטוח חינם")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-              style={{ background: '#25D366' }}
+              onClick={() => trackEvent("cta_whatsapp_click")}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-lg font-bold text-white transition-transform hover:scale-105"
+              style={{ background: "#25d366" }}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.638l4.67-1.228A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.143 0-4.142-.612-5.848-1.678a.5.5 0 00-.398-.052l-3.4.895.737-3.088a.5.5 0 00-.07-.422A9.935 9.935 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
-              {"שלחו הודעה בוואטסאפ"}
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.913.913l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.37 0-4.567-.696-6.416-1.89l-.447-.287-3.174 1.064 1.064-3.174-.287-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              WhatsApp
             </a>
             <a
               href={`tel:${YORAM_CONFIG.phone}`}
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold text-white border-2 border-white/30 transition-all duration-300 hover:bg-white/10 hover:border-white/60"
+              onClick={() => trackEvent("cta_phone_click")}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-lg font-bold border-2 border-white/30 text-white transition-all hover:bg-white/10"
             >
               <PhoneIcon />
               {YORAM_CONFIG.phone}
@@ -371,49 +356,39 @@ export default function YoramLandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <footer className="py-12 border-t" style={{ background: "#0f172a", borderColor: "#1e3a5f" }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg, #1a2a5e, #2b6cb0)' }}>YF</div>
-                <span className="text-white font-semibold">{YORAM_CONFIG.businessName}</span>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: "linear-gradient(135deg, #1a2a5e, #2b6cb0)" }}>YF</div>
+                <span className="text-white font-bold text-lg">{YORAM_CONFIG.businessName}</span>
               </div>
-              <p className="text-sm leading-relaxed">
-                {"סוכן ביטוח מורשה עם ניסיון של מעל ל-25 שנה. מתמחה במציאת הפתרונות הטובות ביותר עבור כל לקוח."}
-              </p>
+              <p className="text-sm" style={{ color: "#94a3b8" }}>{YORAM_CONFIG.complianceFooter}</p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">{"תחומי התמחות"}</h4>
-              <ul className="space-y-2 text-sm">
-                <li>{"ביטוח חיים ומשכנתא"}</li>
-                <li>{"פנסיה וגמל"}</li>
-                <li>{"חיסכונות והשקעות"}</li>
-                <li>{"ביטוח עסקי ורכב"}</li>
-              </ul>
+              <h4 className="text-white font-bold mb-3">קישורים</h4>
+              <div className="space-y-2">
+                {navItems.map((n) => (
+                  <a key={n.id} href={`#${n.id}`} onClick={(e) => { e.preventDefault(); smoothScroll(n.id); }} className="block text-sm transition-colors hover:text-white" style={{ color: "#94a3b8" }}>{n.label}</a>
+                ))}
+              </div>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">{"צור קשר"}</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <PhoneIcon />
-                  <a href={`tel:${YORAM_CONFIG.phone}`} className="hover:text-white transition-colors">{YORAM_CONFIG.phone}</a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  <span>yoram@friedmanbit.co.il</span>
-                </li>
-              </ul>
+              <h4 className="text-white font-bold mb-3">צור קשר</h4>
+              <div className="space-y-2 text-sm" style={{ color: "#94a3b8" }}>
+                <a href={`tel:${YORAM_CONFIG.phone}`} className="block transition-colors hover:text-white">{YORAM_CONFIG.phone}</a>
+                <a href={`https://wa.me/${YORAM_CONFIG.whatsapp}`} target="_blank" rel="noopener noreferrer" className="block transition-colors hover:text-white">WhatsApp</a>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 text-center text-xs">
-            <p>{YORAM_CONFIG.complianceFooter}</p>
-            <p className="mt-2 text-gray-600">{"© "}{new Date().getFullYear()}{" "}{YORAM_CONFIG.businessName}{". כל הזכויות שמורות."}</p>
+          <div className="pt-6 border-t text-center text-xs" style={{ borderColor: "#1e3a5f", color: "#64748b" }}>
+            © {new Date().getFullYear()} {YORAM_CONFIG.businessName}. כל הזכויות שמורות.
           </div>
         </div>
       </footer>
 
       <WhatsAppFAB />
-    </div>
+    </main>
   );
 }
