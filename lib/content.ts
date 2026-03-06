@@ -15,79 +15,53 @@ export const YORAM_CONFIG = {
   businessNameEn: "Yoram Friedman Insurance",
   tagline: "בדיקה חינם. הוזלה אמיתית. שקט למשפחה.",
   logoUrl: "/lp/yoram-logo.png",
-
-  // Colors from YF logo
   primaryColor: "#1a2a5e",
   accentColor: "#2b6cb0",
   ctaColor: "#f97316",
-
-  heroHeadline: "ביטוח משכנתא או ביטוח חיים?\nסיכוי גבוה שאתם משלמים יותר מדי.",
-  heroSubheadline:
-    "בדיקה חינמית אחת דרך הר הביטוח הממשלתי — וחיסכון של עד 60% מהתשלום החודשי. בלי התחייבות, בלי ניירת.",
-  ctaText: "לבדיקה חינם — תוך 24 שעות",
-
-  // Contact from FB page (facebook.com/friedmanbit)
+  heroHeadline: "המשכנתא שלך יקרה מדי. ביטוח החיים שלך – גם.",
+  heroSubheadline: "בדיקה חינם של תיק הביטוח – משכנתא, ביטוח חיים, ביטוח רכב ופנסיה – ולגלות חיסכון אמיתי בלי לוותר על כיסוי.",
+  ctaText: "לבדיקה חינם בוואטסאפ",
   whatsappNumber: "972522422274",
   phone: "04-866-9460",
   email: "yoram@friedmanbit.co.il",
 
+  // Stats for animated counters — from Blueprint & strategy docs
+  stats: [
+    { value: 60, suffix: "%", label: "חיסכון ממוצע" },
+    { value: 3500, suffix: "+", label: "משפחות שנבדקו" },
+    { value: 25, suffix: "+", label: "שנות ניסיון" },
+  ],
+
   sections: {
-    // 5-step process from Social Media Content Strategy, post #10
     steps: [
-      {
-        title: "משאירים פרטים",
-        description: "שם וטלפון. 10 שניות וסיימתם.",
-      },
-      {
-        title: "שיחה קצרה",
-        description: "מתאמים שיחה, לוקחים ת.ז. ותאריך לידה — בלי ניירת.",
-      },
-      {
-        title: "בדיקה מול הר הביטוח",
-        description: "סורקים את כל הפוליסות שלכם — ביטוח חיים, משכנתא, בריאות. מזהים כפלים ותשלומי יתר.",
-      },
-      {
-        title: "הצעה שקופה",
-        description: "מקבלים דוח מסודר: כמה משלמים היום, כמה אפשר לחסוך, ואיך.",
-      },
-      {
-        title: "ההחלטה שלכם",
-        description:
-          "רוצים לעבור? אנחנו מטפלים בהכל. לא מתאים? נפרדים כחברים. הבדיקה חינם לגמרי.",
-      },
+      { number: 1, title: "שלחו פרטים בוואטסאפ", description: "שם + טלפון + תמונת תעודת משכנתא" },
+      { number: 2, title: "ננתח את התיק שלכם", description: "משכנתא, ביטוח חיים, ביטוח רכב, פנסיה" },
+      { number: 3, title: "דו״ח השוואה אישי", description: "מראים לכם בדיוק איפה אפשר לשפר" },
+      { number: 4, title: "מיישמים את השינוי", description: "אנחנו מטפלים בכל הבירוקרטיה מולכם" },
+      { number: 5, title: "נהנים מחיסכון אמיתי", description: "בממוצע 60% חיסכון בביטוח החיים צמוד למשכנתא" },
     ],
-
-    // Credentials from Blueprint Q&A (questions 20, 16, 73)
     credentials: [
-      { label: "שנות ניסיון", value: "40+" },
-      { label: "פרסי סוכן מצטיין", value: "10" },
-      { label: "חברות ביטוח", value: "כולן" },
-      { label: "חיסכון עד", value: "60%" },
+      { label: "סוכן ביטוח מורשה", value: "משרד האוצר – רישיון מלא" },
+      { label: "ניסיון", value: "25+ שנות בתחום" },
+      { label: "התמחות", value: "ביטוח חיים + משכנתא + רכב + פנסיה" },
+      { label: "גישה", value: "שירות אישי וזמין בכל שלב" },
     ],
-
-    // NO testimonials — Blueprint: "אין במה להשתמש כרגע"
     testimonials: [],
-
-    // Differentiators from Blueprint Q&A (questions 16-18)
     differentiators: [
       {
-        title: "משווים בין כל החברות",
-        description:
-          "לא קשורים לחברה אחת. בודקים את כולן ומביאים לכם את המחיר הכי טוב — על ביטוח חיים ומשכנתא.",
+        title: "בדיקה אישית, לא רובוטית",
+        description: "יורם בודק כל תיק באופן אישי – לא אלגוריתם ולא מרכז מכירות",
       },
       {
-        title: "40+ שנה בשטח",
-        description: "עשרה פרסי סוכן מצטיין. ליווי אישי מהבדיקה ועד החתימה.",
+        title: "חיסכון בלי לוותר על כיסוי",
+        description: "אותו ביטוח, אותו רמת שירות – רק בחברה טובה יותר",
       },
       {
-        title: "בדיקה ממשלתית — בחינם",
-        description:
-          "שולפים את כל הנתונים מהר הביטוח הממשלתי. רואים בדיוק איפה יש כפלים ואיפה אפשר לחסוך.",
+        title: "משכנתא + חיים + רכב + פנסיה במקום אחד",
+        description: "במקום לרוץ בין סוכנים – הכל נבדק במקום אחד",
       },
     ],
-
-    // Compliance — Section 55 CMISA, license 604725
     complianceFooter:
-      "יורם פרידמן — סוכן ביטוח ופיננסים מורשה | רישיון מס׳ 604725. האמור אינו מהווה ייעוץ ביטוחי. הפרטים מוגנים ולא יועברו לצד שלישי. פרסומת.",
+      "יורם פרידמן – סוכן ביטוח מורשה | משרד האוצר, רישיון מלא | האמור באתר אינו מהווה המלצה לביצוע בפועל ואינו מהווה הצעה לפעולה מסוימת",
   },
 } as const;
