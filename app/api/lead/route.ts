@@ -5,7 +5,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, phone, source } = body;
 
-    // Validate required fields
     if (!name || !phone) {
       return NextResponse.json(
         { error: "name and phone are required" },
@@ -13,7 +12,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate phone format (Israeli numbers)
     const phoneClean = phone.replace(/[\s\-()]/g, "");
     const isValid =
       /^0[2-9]\d{7,8}$/.test(phoneClean) ||
@@ -27,7 +25,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Log the lead (replace with DB/webhook later)
     const lead = {
       name: name.trim(),
       phone: phoneClean,
@@ -39,8 +36,20 @@ export async function POST(req: NextRequest) {
 
     console.log("[LEAD]", JSON.stringify(lead));
 
-    // TODO: Send to webhook / DB / CRM
-    // await fetch(process.env.LEAD_WEBHOOK_URL, { method: "POST", body: JSON.stringify(lead) });
+    // Send to n8n webhook for WhatsApp notification
+    const webhookUrl = process.env.LEAD_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(lead),
+        });
+      } catch (webhookErr) {
+        console.error("[LEAD WEBHOOK ERROR]", webhookErr);
+        // Don't fail the response if webhook fails
+      }
+    }
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {
