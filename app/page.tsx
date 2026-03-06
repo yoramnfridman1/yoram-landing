@@ -156,7 +156,7 @@ export default function YoramLandingPage() {
       </nav>
 
       {/* Hero */}
-      <section ref={heroReveal.ref} className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${heroReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section ref={heroReveal.ref} className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${heroReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#12244a] to-[#1a2b5e]" />
         <div className="absolute top-20 right-10 w-72 h-72 bg-[#3b8fd4] rounded-full opacity-10 blur-3xl animate-[orbFloat_8s_ease-in-out_infinite]" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#1a2b5e] rounded-full opacity-15 blur-3xl animate-[orbFloat_12s_ease-in-out_infinite_reverse]" />
@@ -211,7 +211,7 @@ export default function YoramLandingPage() {
       </section>
 
       {/* Steps */}
-      <section id="steps" ref={stepsReveal.ref} className={`py-24 relative ${stepsReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section id="steps" ref={stepsReveal.ref} className={`py-24 relative ${stepsReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
             <span className="gradient-text">{YORAM_CONFIG.stepsTitle}</span>
@@ -235,7 +235,7 @@ export default function YoramLandingPage() {
       </section>
 
       {/* Differentiators */}
-      <section id="why" ref={diffReveal.ref} className={`py-24 relative ${diffReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section id="why" ref={diffReveal.ref} className={`py-24 relative ${diffReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
             <span className="gradient-text">{YORAM_CONFIG.diffTitle}</span>
@@ -259,7 +259,7 @@ export default function YoramLandingPage() {
       </section>
 
       {/* Stats */}
-      <section ref={statsReveal.ref} className={`py-24 relative ${statsReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section ref={statsReveal.ref} className={`py-24 relative ${statsReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a2b5e]/50 to-[#0a1628]/50" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -278,7 +278,7 @@ export default function YoramLandingPage() {
       </section>
 
       {/* Credentials */}
-      <section id="credentials" ref={credReveal.ref} className={`py-24 relative ${credReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section id="credentials" ref={credReveal.ref} className={`py-24 relative ${credReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
             <span className="gradient-text">{YORAM_CONFIG.credentialsTitle}</span>
@@ -299,7 +299,7 @@ export default function YoramLandingPage() {
       </section>
 
       {/* CTA */}
-      <section ref={ctaReveal.ref} className={`py-24 relative overflow-hidden ${ctaReveal.isVisible ? 'animate-fadeIn' : 'opacity-0'}`}>
+      <section ref={ctaReveal.ref} className={`py-24 relative overflow-hidden ${ctaReveal.isVisible ? 'animate-fadeIn' : 'animate-fadeIn'}`}>
         <div className="absolute inset-0 bg-gradient-to-br from-[#1a2b5e] via-[#3b8fd4]/20 to-[#0a1628]" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#3b8fd4] rounded-full opacity-10 blur-3xl animate-[orbFloat_10s_ease-in-out_infinite]" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
