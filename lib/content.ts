@@ -24,7 +24,7 @@ export const YORAM_CONFIG = {
   stepsTitle: "איך זה עובד?",
   stepsSubtitle: "5 צעדים פשוטים לחיסכון משמעותי",
   diffTitle: "למה יורם פרידמן?",
-  diffSubtitle: "25+ שנות ניסיון. אובייקטיביות מלאה. עובדים בשבילכם.",
+  diffSubtitle: "40+ שנות ניסיון. אובייקטיביות מלאה. עובדים בשבילכם.",
   credentialsTitle: "ניסיון והסמכות",
   credentialsSubtitle: "סוכן ביטוח מורשה עם עשרות שנות ניסיון",
   ctaTitle: "רוצים לדעת כמה אתם יכולים לחסוך?",
@@ -32,7 +32,7 @@ export const YORAM_CONFIG = {
   stats: [
     { value: 60, suffix: "%", label: "חיסכון ממוצע" },
     { value: 3500, suffix: "+", label: "משפחות שנבדקו" },
-    { value: 25, suffix: "+", label: "שנות ניסיון" },
+    { value: 40, suffix: "+", label: "שנות ניסיון" },
   ],
   steps: [
     { number: "שלב 1", title: "ממלאים טופס קצר", description: "שם וטלפון – זה הכל" },
@@ -43,7 +43,7 @@ export const YORAM_CONFIG = {
   ],
   credentials: [
     { title: "סוכן מורשה", value: "רישיון משרד האוצר", icon: "🛡️" },
-    { title: "25+ שנות ניסיון", value: "מאז 1999", icon: "🏆" },
+    { title: "40+ שנות ניסיון", value: "מאז 1984", icon: "🏆" },
     { title: "אובייקטיביות מלאה", value: "עובדים בשבילכם", icon: "🤝" },
     { title: "מתמחה במשכנתא", value: "60% חיסכון ממוצע", icon: "💰" },
   ],
