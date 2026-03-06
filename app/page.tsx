@@ -266,7 +266,7 @@ export default function YoramLandingPage() {
             <div key={i} style={{ textAlign:"center" }}>
               <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:"linear-gradient(135deg,#1a2a5e,#2b6cb0)", color:"white", fontWeight:800, fontSize:"1.4rem", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", boxShadow:"0 4px 15px rgba(26,42,94,0.25)" }}>{i + 1}</div>
               <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"6px" }}>{s.title}</h3>
-              <p style={{ color:"#666", fontSize:"0.9rem" }}>{s.desc}</p>
+              <p style={{ color:"#666", fontSize:"0.9rem" }}>{s.description}</p>
             </div>
           ))}
         </div>
@@ -285,7 +285,7 @@ export default function YoramLandingPage() {
                   onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none"}}>
                   <div style={{ display:"flex", justifyContent:"center", marginBottom:"16px" }}><Icon /></div>
                   <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"8px", fontSize:"1.15rem" }}>{d.title}</h3>
-                  <p style={{ color:"#666", fontSize:"0.92rem", lineHeight:1.7 }}>{d.desc}</p>
+                  <p style={{ color:"#666", fontSize:"0.92rem", lineHeight:1.7 }}>{d.description}</p>
                 </div>
               );
             })}
@@ -315,7 +315,7 @@ export default function YoramLandingPage() {
               onMouseEnter={e=>e.currentTarget.style.transform="translateY(-4px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
               <div style={{ fontSize:"2.5rem", marginBottom:"12px" }}>{c.icon}</div>
               <h3 style={{ fontWeight:700, color:"#1a2a5e", marginBottom:"6px" }}>{c.title}</h3>
-              <p style={{ color:"#666", fontSize:"0.9rem" }}>{c.desc}</p>
+              <p style={{ color:"#666", fontSize:"0.9rem" }}>{c.value}</p>
             </div>
           ))}
         </div>
