@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="swooshGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a2b5e"/>
+      <stop offset="100%" stop-color="#3b8fd4"/>
+    </linearGradient>
+    <linearGradient id="fGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e7bc4"/>
+      <stop offset="100%" stop-color="#3b8fd4"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b8fd4"/>
+      <stop offset="100%" stop-color="#5cb3e8"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Y letter - dark navy, serif style -->
+  <g fill="#1a2b5e">
+    <!-- Left arm of Y -->
+    <path d="M80,80 L100,80 L168,190 L148,190 Z"/>
+    <!-- Right arm of Y -->
+    <path d="M220,80 L240,80 L172,190 L152,190 Z"/>
+    <!-- Stem of Y -->
+    <rect x="148" y="185" width="24" height="120" rx="2"/>
+  </g>
+  
+  <!-- Swoosh - flowing S-curve from bottom-left to upper-right -->
+  <path d="M90,320 C120,280 140,240 160,210 C180,180 200,160 230,140 C260,120 280,110 310,105" 
+        stroke="url(#swooshGrad)" stroke-width="14" fill="none" stroke-linecap="round"/>
+  
+  <!-- F letter - lighter blue, positioned right -->
+  <g fill="url(#fGrad)">
+    <!-- Vertical stem of F -->
+    <rect x="230" y="110" width="22" height="190" rx="2"/>
+    <!-- Top horizontal bar of F -->
+    <rect x="230" y="110" width="90" height="18" rx="2"/>
+    <!-- Middle horizontal bar of F -->
+    <rect x="230" y="190" width="70" height="16" rx="2"/>
+  </g>
+  
+  <!-- Leaf/sprout accent at top-right -->
+  <g fill="url(#leafGrad)">
+    <!-- Leaf shape -->
+    <path d="M318,102 C325,85 335,78 340,75 C338,88 330,95 322,102 Z"/>
+    <path d="M320,100 C328,84 322,72 318,65 C315,78 315,90 320,100 Z"/>
+    <!-- Water droplet -->
+    <path d="M330,62 C332,55 335,50 335,46 C335,42 332,40 330,40 C328,40 325,42 325,46 C325,50 328,55 330,62 Z" fill="#3b8fd4"/>
+  </g>
+</svg>
