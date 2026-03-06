@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
         });
       } catch (webhookErr) {
         console.error("[LEAD WEBHOOK ERROR]", webhookErr);
-        // Don't fail the response if webhook fails
       }
     }
 
