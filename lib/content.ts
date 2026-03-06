@@ -3,7 +3,6 @@ export const YORAM_CONFIG = {
   businessNameEn: "Yoram Friedman Insurance",
   companyName: "יורם פרידמן סוכנות לביטוח",
   tagline: "בדיקה חינם. הוזלה אמיתית. שקט למשפחה.",
-  logoUrl: "/lp/yoram-logo.png",
   primaryColor: "#1a2a5e",
   accentColor: "#2b6cb0",
   ctaColor: "#3b8fd4",
