@@ -42,7 +42,7 @@ function useScrollReveal<T extends HTMLElement>(threshold = 0.05) {
 }
 
 /* ── Animated counter hook ── */
-function useAnimatedCounter(end: number, duration: number, start: boolean) {
+function useAnimatedCounter(end: number, start: boolean, duration: number = 2000) {
   const [val, setVal] = React.useState(0);
   React.useEffect(() => {
     if (!start) return;
@@ -148,9 +148,9 @@ export default function YoramLandingPage() {
   const statsRef = useScrollReveal<HTMLElement>();
   const credRef = useScrollReveal<HTMLElement>();
 
-  const stat0 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[0].value), stepsRef.inView);
-  const stat1 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[1].value.replace(/[+,]/g, "")), stepsRef.inView);
-  const stat2 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[2].value.replace(/[+]/g, "")), stepsRef.inView);
+  const stat0 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[0].value), statsRef.isVisible);
+  const stat1 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[1].value.replace(/[+,]/g, "")), statsRef.isVisible);
+  const stat2 = useAnimatedCounter(parseInt(YORAM_CONFIG.stats[2].value.replace(/[+]/g, "")), statsRef.isVisible);
   const statValues = [stat0, stat1, stat2];
 
   const navItems = [
@@ -259,7 +259,7 @@ export default function YoramLandingPage() {
         </div>
       </section>
       {/* ── Steps ── */}
-      <section id="steps" ref={stepsRef.ref} style={{ padding:"100px 24px", maxWidth:"1200px", margin:"0 auto", opacity: stepsRef.inView ? 1 : 0, transform: stepsRef.inView ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
+      <section id="steps" ref={stepsRef.ref} style={{ padding:"100px 24px", maxWidth:"1200px", margin:"0 auto", opacity: statsRef.isVisible ? 1 : 0, transform: statsRef.isVisible ? "translateY(0)" : "translateY(30px)", transition:"opacity 0.8s ease-out, transform 0.8s ease-out" }}>
         <h2 style={{ textAlign:"center", fontSize:"2rem", fontWeight:700, color:"#1a2a5e", marginBottom:"60px" }}>איך זה עובד?</h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap:"32px" }}>
           {YORAM_CONFIG.steps.map((s, i) => (
