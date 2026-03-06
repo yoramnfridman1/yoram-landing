@@ -3,19 +3,21 @@ import * as React from "react";
 import { YORAM_CONFIG } from "../lib/content";
 
 /* ── Scroll-reveal hook ── */
-function useScrollReveal<T extends HTMLElement>(threshold = 0.15) {
+function useScrollReveal<T extends HTMLElement>(threshold = 0.05) {
   const ref = React.useRef<T>(null);
   const [isVisible, setIsVisible] = React.useState(false);
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const show = () => setIsVisible(true);
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); obs.disconnect(); } },
-      { threshold, rootMargin: "-40px" }
+      ([entry]) => { if (entry.isIntersecting) { show(); obs.disconnect(); clearTimeout(timer); } },
+      { threshold: 0.01, rootMargin: "50px" }
     );
     obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
+    const timer = setTimeout(show, 1800);
+    return () => { obs.disconnect(); clearTimeout(timer); };
+  }, []);
   return { ref, isVisible };
 }
 
