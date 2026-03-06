@@ -45,6 +45,9 @@ export async function POST(req: NextRequest) {
     const notifyChat = process.env.LEAD_NOTIFY_CHAT || "972544969668@c.us";
     const wahaSession = process.env.WAHA_SESSION || "superseller-whatsapp";
 
+    let wahaStatus = "skipped";
+    let wahaDetail = "";
+
     if (wahaKey) {
       const msg = [
         "\ud83d\udd14 \u05dc\u05d9\u05d3 \u05d7\u05d3\u05e9 - \u05d9\u05d5\u05e8\u05dd \u05e4\u05e8\u05d9\u05d3\u05de\u05df",
@@ -56,7 +59,7 @@ export async function POST(req: NextRequest) {
       ].join("\n");
 
       try {
-        await fetch(`${wahaUrl}/api/sendText`, {
+        const wahaResp = await fetch(`${wahaUrl}/api/sendText`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -68,12 +71,21 @@ export async function POST(req: NextRequest) {
             session: wahaSession,
           }),
         });
-      } catch (wahaErr) {
+        wahaStatus = String(wahaResp.status);
+        wahaDetail = await wahaResp.text();
+      } catch (wahaErr: any) {
+        wahaStatus = "error";
+        wahaDetail = wahaErr?.message || String(wahaErr);
         console.error("[LEAD WAHA ERROR]", wahaErr);
       }
+    } else {
+      wahaDetail = "WAHA_API_KEY not set";
     }
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json(
+      { ok: true, waha: { status: wahaStatus, detail: wahaDetail } },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("[LEAD ERROR]", err);
     return NextResponse.json({ error: "server error" }, { status: 500 });
