@@ -46,7 +46,7 @@ function Counter({ target, suffix = "", duration = 2000 }: { target: number; suf
           requestAnimationFrame(step);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -60,11 +60,15 @@ function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll(".reveal");
     const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } }),
+      { threshold: 0.05, rootMargin: "0px 0px 50px 0px" }
     );
     els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
+    // Fallback: force all reveals visible after 2.5s (ensures no invisible sections)
+    const fallback = setTimeout(() => {
+      document.querySelectorAll(".reveal:not(.visible)").forEach((el) => el.classList.add("visible"));
+    }, 2500);
+    return () => { obs.disconnect(); clearTimeout(fallback); };
   }, []);
 }
 
