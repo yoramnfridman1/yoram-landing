@@ -319,7 +319,7 @@ export default function HomePage() {
               <span className="hero-title-line shimmer-text">ללא עלות</span>
             </h1>
             <p className="hero-subtitle">
-              {c.stats?.experience || '40'}+ שנות ניסיון בביטוח חיים, פנסיה, משכנתאות וחיסכון.
+              40+ שנות ניסיון בביטוח חיים, פנסיה, משכנתאות וחיסכון.
               <br />בדיקה מקצועית שיכולה לחסוך לך אלפי שקלים בשנה.
             </p>
             <div className="hero-buttons">
@@ -336,7 +336,7 @@ export default function HomePage() {
         {/* ═══ PARTNER MARQUEE ═══ */}
         <div className="marquee-strip" aria-hidden="true">
           <div className="marquee-track">
-            {[...c.partners, ...c.partners].map((p, i) => (
+            {[...c.partnerCompanies, ...c.partnerCompanies].map((p, i) => (
               <span key={i} className="marquee-item">
                 <span className="marquee-dot" />
                 {p}
@@ -348,14 +348,9 @@ export default function HomePage() {
         {/* ═══ STATS ═══ */}
         <section className="stats-section" ref={revStats} aria-label="נתונים">
           <div className="stats-grid">
-            {c.stats && [
-              { end: parseInt(c.stats.experience) || 40, suffix: '+', label: 'שנות ניסיון' },
-              { end: parseInt(c.stats.clients) || 5000, suffix: '+', label: 'לקוחות מרוצים' },
-              { end: parseInt(c.stats.savings) || 15, suffix: '%', label: 'חיסכון ממוצע' },
-              { end: parseInt(c.stats.products) || 200, suffix: '+', label: 'מוצרים פיננסיים' },
-            ].map((s, i) => (
+            {c.stats.map((s, i) => (
               <div key={i} className="stat-card">
-                <Counter end={s.end} suffix={s.suffix} />
+                <Counter end={s.value} suffix={s.suffix} />
                 <span className="stat-label">{s.label}</span>
               </div>
             ))}
@@ -374,7 +369,7 @@ export default function HomePage() {
                     {iconMap[d.icon] || <Shield size={28} />}
                   </div>
                   <h3 className="card-title">{d.title}</h3>
-                  <p className="card-desc">{d.description}</p>
+                  <p className="card-desc">{d.desc}</p>
                 </div>
               ))}
             </div>
@@ -387,12 +382,12 @@ export default function HomePage() {
             <div className="section-tag">איך זה עובד</div>
             <h2 id="process-title" className="section-title">התהליך <span className="shimmer-text">שלנו</span></h2>
             <div className="process-steps">
-              {c.processSteps.map((step, i) => (
+              {c.steps.map((step, i) => (
                 <div key={i} className="process-step">
                   <div className="step-number">{String(i + 1).padStart(2, '0')}</div>
                   <div className="step-content">
                     <h3 className="step-title">{step.title}</h3>
-                    <p className="step-desc">{step.description}</p>
+                    <p className="step-desc">{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -452,7 +447,7 @@ export default function HomePage() {
             <div className="section-tag">שאלות נפוצות</div>
             <h2 id="faq-title" className="section-title">שאלות <span className="shimmer-text">ותשובות</span></h2>
             <div className="faq-list" role="list">
-              {c.faqs.map((faq, i) => (
+              {c.faq.map((faq, i) => (
                 <div key={i} className={`faq-item ${faqOpen === i ? 'open' : ''}`} role="listitem">
                   <button
                     className="faq-question"
@@ -460,7 +455,7 @@ export default function HomePage() {
                     aria-expanded={faqOpen === i}
                     aria-controls={`faq-answer-${i}`}
                   >
-                    <span>{faq.question}</span>
+                    <span>{faq.q}</span>
                     <ChevronDown size={20} className="faq-chevron" />
                   </button>
                   <div
@@ -469,7 +464,7 @@ export default function HomePage() {
                     role="region"
                     aria-hidden={faqOpen !== i}
                   >
-                    <p>{faq.answer}</p>
+                    <p>{faq.a}</p>
                   </div>
                 </div>
               ))}
@@ -577,7 +572,7 @@ export default function HomePage() {
             {c.credentials.map((cr, i) => (
               <div key={i} className="credential-badge">
                 <BadgeCheck size={20} />
-                <span>{cr}</span>
+                <span>{cr.label}: {cr.detail}</span>
               </div>
             ))}
           </div>
