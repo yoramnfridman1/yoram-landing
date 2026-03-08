@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Lead capture endpoint.
- * Sends WhatsApp notification to Yoram via Rensto WAHA Pro.
+ * Sends WhatsApp notification to Yoram via SuperSeller WAHA Pro.
  *
  * Environment variables:
  * - WAHA_API_URL:  WAHA Pro base URL (e.g. http://172.245.56.50:3000)
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, phone, email } = body;
 
-    if (!name || !phone) {
+    if (\!name || \!phone) {
       return NextResponse.json(
         { error: "Name and phone are required" },
         { status: 400 }
@@ -30,10 +30,8 @@ export async function POST(req: NextRequest) {
       source: "landing_page",
     };
 
-    // Log the lead (visible in Vercel logs)
     console.log("NEW LEAD:", JSON.stringify(lead));
 
-    // Send WhatsApp notification via WAHA Pro
     const wahaUrl = process.env.WAHA_API_URL;
     const wahaKey = process.env.WAHA_API_KEY;
     const wahaSession = process.env.WAHA_SESSION || "default";
@@ -42,38 +40,28 @@ export async function POST(req: NextRequest) {
     if (wahaUrl && wahaKey && notifyChatId) {
       try {
         const message = [
-          "ליד חדש מדף הנחיתה!",
+          "ליד חדש מדף הנחיתה\!",
           "",
           `שם: ${name}`,
           `טלפון: ${phone}`,
           `אימייל: ${email || "לא צוין"}`,
           "",
           `זמן: ${new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}`,
-        ].join("\n");
+        ].join("
+");
 
         await fetch(`${wahaUrl}/api/sendText`, {
           method: "POST",
-          headers: {
-            "X-Api-Key": wahaKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            session: wahaSession,
-            chatId: notifyChatId,
-            text: message,
-          }),
+          headers: { "X-Api-Key": wahaKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ session: wahaSession, chatId: notifyChatId, text: message }),
         });
       } catch (err) {
-        // Don't fail the lead submission if notification fails
         console.error("WAHA notification failed:", err);
       }
     }
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }
