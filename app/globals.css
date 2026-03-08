@@ -62,3 +62,33 @@ details .faq-answer { animation:fadeInUp 0.3s ease-out; }
 .step-progress { transition:width 0.5s cubic-bezier(0.16,1,0.3,1); }
 .header-scrolled { box-shadow:0 4px 20px rgba(0,0,0,0.1); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
 .partner-strip { mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent); -webkit-mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent); }
+
+/* Range Slider - Better Mobile Touch */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 12px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
