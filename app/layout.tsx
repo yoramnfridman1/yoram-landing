@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
       </head>
-      <body className="font-[var(--font-heebo)] antialiased bg-[#faf8f5] text-[#1a1a1a]">
+      <body className="font-[var(--font-heebo)] antialiased bg-[#0c1628] text-[#f0ece4]">
         {children}
       </body>
     </html>
