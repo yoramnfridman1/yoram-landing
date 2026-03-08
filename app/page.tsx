@@ -87,7 +87,7 @@ function SavingsCalc() {
       <input
         type="range" min={C.calculator.minPremium} max={C.calculator.maxPremium} step={50}
         value={premium} onChange={(e) => setPremium(+e.target.value)}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[var(--gold)]"
+        aria-label="בחר סכום פרמיה חודשי" className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[var(--gold)]"
       />
       <div className="flex justify-between text-sm text-gray-500 mt-1 mb-6">
         <span>₪{C.calculator.minPremium}</span>
@@ -152,12 +152,12 @@ function LeadForm() {
       {step === 1 && (
         <div className="space-y-4 animate-fadeInUp">
           <input
-            type="text" placeholder="שם מלא" value={form.fullName}
+            type="text" placeholder="שם מלא" aria-label="שם מלא" name="fullName" id="fullName" autoComplete="name" value={form.fullName}
             onChange={(e) => setForm({ ...form, fullName: e.target.value })}
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-right"
           />
           <input
-            type="tel" placeholder="טלפון" value={form.phone} dir="ltr"
+            type="tel" placeholder="טלפון" aria-label="מספר טלפון" name="phone" id="phone" autoComplete="tel" value={form.phone} dir="ltr"
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-left"
           />
@@ -182,7 +182,7 @@ function LeadForm() {
       {step === 3 && (
         <div className="space-y-4 animate-fadeInUp">
           <textarea
-            placeholder="הערות נוספות (לא חובה)" value={form.notes}
+            placeholder="הערות נוספות (לא חובה)" aria-label="הערות נוספות" name="notes" id="notes" value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-right h-28 resize-none"
           />
@@ -212,6 +212,9 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Skip Navigation */}
+      <a href="#form" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:right-4 focus:z-[100] focus:bg-[var(--gold)] focus:text-white focus:px-4 focus:py-3 focus:rounded-lg focus:text-lg focus:shadow-lg">דלג לטופס</a>
+
       {/* ─── Sticky Header ─── */}
       <header className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-white/95 header-scrolled py-2" : "bg-transparent py-4"
@@ -224,10 +227,10 @@ export default function HomePage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <a href={"tel:" + C.phone} className={`hidden sm:flex items-center gap-1 text-sm font-medium transition-colors ${scrolled ? "text-[var(--navy)]" : "text-white"}`}>
+            <a href={"tel:" + C.phone} aria-label="התקשר עכשיו" className={`hidden sm:flex items-center gap-1 text-sm font-medium min-h-[44px] transition-colors ${scrolled ? "text-[var(--navy)]" : "text-white"}`}>
               <Phone className="w-4 h-4" /> {C.phone}
             </a>
-            <a href="#form" className="bg-[var(--gold)] text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-[var(--gold-dark)] transition shadow-md">
+            <a href="#form" className="bg-[var(--gold)] text-white px-5 py-3 min-h-[44px] rounded-full text-sm font-bold hover:bg-[var(--gold-dark)] transition shadow-md">
               בדיקה חינם
             </a>
           </div>
@@ -435,8 +438,8 @@ export default function HomePage() {
               <p className="text-xs mt-1">רישיון סוכן ביטוח מס׳ {C.licenseNumber}</p>
             </div>
             <div className="flex items-center gap-6 text-sm">
-              <a href={"tel:" + C.phone} className="flex items-center gap-1 hover:text-white transition"><Phone className="w-4 h-4" /> {C.phone}</a>
-              <a href={"mailto:" + C.email} className="flex items-center gap-1 hover:text-white transition"><Mail className="w-4 h-4" /> {C.email}</a>
+              <a href={"tel:" + C.phone} className="flex items-center gap-1 hover:text-white transition min-h-[44px] py-2"><Phone className="w-4 h-4" /> {C.phone}</a>
+              <a href={"mailto:" + C.email} className="flex items-center gap-1 hover:text-white transition min-h-[44px] py-2"><Mail className="w-4 h-4" /> {C.email}</a>
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-6 text-center text-xs text-white/40">
