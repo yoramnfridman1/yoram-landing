@@ -1,470 +1,631 @@
-"use client";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { YORAM_CONFIG } from "@/lib/content";
-import {
-  Phone, Mail, MessageCircle, FileSearch, BarChart3, ClipboardCheck,
-  HeartHandshake, Shield, Calendar, Scale, Briefcase, Award, Home,
-  UserCheck, PiggyBank, Users, Building2, TrendingDown, ChevronDown,
-  ChevronRight, Menu, X, Calculator, Send, ArrowDown, Star, CheckCircle2
-} from "lucide-react";
+'use client';
 
-const C = YORAM_CONFIG;
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Phone, MessageCircle, Shield, TrendingUp, Users, Clock, ChevronDown, ChevronLeft, ChevronRight, Award, BadgeCheck, Star, ArrowLeft, Calculator, Briefcase, Heart, PiggyBank, Home, CheckCircle2, Send } from 'lucide-react';
+import { YORAM_CONFIG } from '@/lib/content';
 
-const ICON_MAP: Record<string, any> = {
-  Phone, Mail, MessageCircle, FileSearch, BarChart3, ClipboardCheck,
-  HeartHandshake, Shield, Calendar, Scale, Briefcase, Award, Home,
-  UserCheck, PiggyBank, Users, Building2, TrendingDown, ChevronDown,
-  ChevronRight, Menu, X, Calculator, Send, ArrowDown, Star, CheckCircle2,
-};
+/* ───────── Page Loader ───────── */
+function PageLoader() {
+  const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
 
-function Icon({ name, className = "w-6 h-6" }: { name: string; className?: string }) {
-  const Comp = ICON_MAP[name];
-  return Comp ? <Comp className={className} /> : null;
+  useEffect(() => {
+    let frame: number;
+    let start: number;
+    const duration = 1800;
+    const animate = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setProgress(Math.round(p * 100));
+      if (p < 1) { frame = requestAnimationFrame(animate); }
+      else { setTimeout(() => setVisible(false), 300); }
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  if (!visible) return null;
+  return (
+    <div className={`page-loader ${progress >= 100 ? 'loaded' : ''}`}>
+      <div className="loader-content">
+        <div className="loader-logo">יורם פרידמן</div>
+        <div className="loader-bar-track">
+          <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
-/* ─── Animated Counter ─── */
-function Counter({ target, suffix = "", duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
-  const [count, setCount] = useState(0);
+/* ───────── Canvas Particles (Hero Background) ───────── */
+function ParticleCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let w = 0, h = 0, mouseX = -999, mouseY = -999;
+    let animId: number;
+
+    const resize = () => {
+      w = canvas.width = canvas.offsetWidth;
+      h = canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles: { x: number; y: number; vx: number; vy: number; r: number }[] = [];
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 0.5,
+      });
+    }
+
+    const onMouse = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    };
+    canvas.addEventListener('mousemove', onMouse);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(200,146,42,0.4)';
+        ctx.fill();
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(200,146,42,${0.12 * (1 - dist / 140)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+        // Mouse interaction
+        const mdx = particles[i].x - mouseX;
+        const mdy = particles[i].y - mouseY;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.strokeStyle = `rgba(200,146,42,${0.25 * (1 - mdist / 120)})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      canvas.removeEventListener('mousemove', onMouse);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="hero-canvas" aria-hidden="true" />;
+}
+
+/* ───────── Reveal Hook ───────── */
+function useReveal(direction: string = 'up') {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const cls = direction === 'left' ? 'reveal-left' : direction === 'right' ? 'reveal-right' : direction === 'scale' ? 'reveal-scale' : direction === 'down' ? 'reveal-down' : 'reveal-up';
+    el.classList.add(cls);
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { el.classList.add('revealed'); obs.unobserve(el); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    obs.observe(el);
+    const t = setTimeout(() => { if (!el.classList.contains('revealed')) el.classList.add('revealed'); }, 4000);
+    return () => { obs.disconnect(); clearTimeout(t); };
+  }, [direction]);
+  return ref;
+}
+
+/* ───────── Counter ───────── */
+function Counter({ end, suffix = '', prefix = '' }: { end: number; suffix?: string; prefix?: string }) {
+  const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const step = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(eased * target));
-            if (progress < 1) requestAnimationFrame(step);
-            else setCount(target);
-          };
-          requestAnimationFrame(step);
-        }
-      },
-      { threshold: 0.1 }
-    );
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const dur = 2000;
+        const st = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - st) / dur, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          setVal(Math.round(ease * end));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        obs.unobserve(el);
+      }
+    }, { threshold: 0.3 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [target, duration]);
+  }, [end]);
 
-  return <span ref={ref} className="tabular-nums">{count.toLocaleString("he-IL")}{suffix}</span>;
+  return <span ref={ref} className="shimmer-text stat-number">{prefix}{val.toLocaleString()}{suffix}</span>;
 }
 
-/* ─── Scroll reveal hook ─── */
-function useReveal() {
+/* ───────── Icon Map ───────── */
+const iconMap: Record<string, React.ReactNode> = {
+  shield: <Shield size={28} />, trending: <TrendingUp size={28} />,
+  users: <Users size={28} />, clock: <Clock size={28} />,
+  award: <Award size={28} />, star: <Star size={28} />,
+  heart: <Heart size={28} />, piggy: <PiggyBank size={28} />,
+  briefcase: <Briefcase size={28} />, home: <Home size={28} />,
+  calculator: <Calculator size={28} />, badge: <BadgeCheck size={28} />,
+};
+
+/* ═══════════ MAIN PAGE ═══════════ */
+export default function HomePage() {
+  const c = YORAM_CONFIG;
+  const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
+
+  // Scroll header effect
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal");
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } }),
-      { threshold: 0.05, rootMargin: "0px 0px 50px 0px" }
-    );
-    els.forEach((el) => obs.observe(el));
-    // Fallback: force all reveals visible after 2.5s (ensures no invisible sections)
-    const fallback = setTimeout(() => {
-      document.querySelectorAll(".reveal:not(.visible)").forEach((el) => el.classList.add("visible"));
-    }, 2500);
-    return () => { obs.disconnect(); clearTimeout(fallback); };
+    const handler = () => setHeaderScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', handler, { passive: true });
+    return () => window.removeEventListener('scroll', handler);
   }, []);
-}
 
-/* ─── Savings Calculator ─── */
-function SavingsCalc() {
-  const [premium, setPremium] = useState(C.calculator.defaultPremium);
-  const savings = Math.round(premium * C.calculator.avgSavingsPercent);
-  return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg mx-auto border border-[var(--gold)]/20">
-      <div className="text-center mb-6">
-        <Calculator className="w-10 h-10 text-[var(--gold)] mx-auto mb-3" />
-        <h3 className="text-2xl font-bold text-[var(--navy)]">{C.calculator.title}</h3>
-        <p className="text-gray-600 mt-1 text-sm">{C.calculator.subtitle}</p>
-      </div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">סכום פרמיה חודשי (₪)</label>
-      <input
-        type="range" min={C.calculator.minPremium} max={C.calculator.maxPremium} step={50}
-        value={premium} onChange={(e) => setPremium(+e.target.value)}
-        aria-label="בחר סכום פרמיה חודשי" className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[var(--gold)]"
-      />
-      <div className="flex justify-between text-sm text-gray-500 mt-1 mb-6">
-        <span>₪{C.calculator.minPremium}</span>
-        <span className="font-bold text-[var(--navy)] text-lg">₪{premium.toLocaleString("he-IL")}</span>
-        <span>₪{C.calculator.maxPremium.toLocaleString("he-IL")}</span>
-      </div>
-      <div className="bg-gradient-to-l from-[var(--navy)] to-[var(--navy-light)] text-white rounded-xl p-6 text-center">
-        <p className="text-sm opacity-80 mb-1">חיסכון שנתי משוער</p>
-        <p className="text-4xl font-bold font-[var(--font-rubik)]">₪{(savings * 12).toLocaleString("he-IL")}</p>
-        <p className="text-xs opacity-60 mt-2">(₪{savings.toLocaleString("he-IL")} לחודש)</p>
-      </div>
-      <p className="text-xs text-gray-400 mt-4 text-center">{C.calculator.disclaimerText}</p>
-    </div>
-  );
-}
+  // Hero staggered entrance
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 300);
+    return () => clearTimeout(t);
+  }, []);
 
-/* ─── Multi-step Form ─── */
-function LeadForm() {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ fullName: "", phone: "", insuranceType: "", notes: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // Reveal refs for each section
+  const revStats = useReveal('up');
+  const revWhy = useReveal('up');
+  const revProcess = useReveal('up');
+  const revCalc = useReveal('up');
+  const revFaq = useReveal('left');
+  const revForm = useReveal('scale');
+  const revCreds = useReveal('up');
+  const revCta = useReveal('up');
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      setSubmitted(true);
-    } catch { setSubmitted(true); }
-    setLoading(false);
+  /* ─── Calculator State ─── */
+  const [calcAge, setCalcAge] = useState(35);
+  const [calcSavings, setCalcSavings] = useState(500000);
+  const calcPotential = Math.round(calcSavings * 0.012 * (65 - calcAge));
+
+  /* ─── FAQ State ─── */
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+
+  /* ─── Form State ─── */
+  const [formStep, setFormStep] = useState(0);
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '', insuranceTypes: [] as string[], message: '' });
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  const insuranceTypes = c.insuranceTypes || ['ביטוח חיים', 'פנסיה', 'משכנתא', 'חיסכון', 'ביטוח בריאות'];
+
+  const toggleInsurance = (type: string) => {
+    setFormData(prev => ({
+      ...prev,
+      insuranceTypes: prev.insuranceTypes.includes(type)
+        ? prev.insuranceTypes.filter(t => t !== type)
+        : [...prev.insuranceTypes, type]
+    }));
   };
 
-  if (submitted) {
-    return (
-      <div className="text-center py-12">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-[var(--navy)]">תודה רבה!</h3>
-        <p className="text-gray-600 mt-2">קיבלנו את הפרטים שלכם. יורם יחזור אליכם בהקדם.</p>
-      </div>
-    );
-  }
+  const submitForm = async () => {
+    setFormSubmitting(true);
+    try {
+      await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      setFormSuccess(true);
+    } catch { setFormSuccess(true); }
+    setFormSubmitting(false);
+  };
 
-  return (
-    <div className="max-w-lg mx-auto">
-      {/* Progress bar */}
-      <div className="flex items-center justify-between mb-8">
-        {C.formSteps.map((s) => (
-          <div key={s.step} className="flex items-center flex-1">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-              step >= s.step ? "bg-[var(--gold)] text-white shadow-lg" : "bg-gray-200 text-gray-500"
-            }`}>{s.step}</div>
-            {s.step < 3 && <div className={`flex-1 h-1 mx-2 rounded transition-all duration-500 ${step > s.step ? "bg-[var(--gold)]" : "bg-gray-200"}`} />}
-          </div>
-        ))}
-      </div>
-      <p className="text-center text-sm text-gray-500 mb-6">{C.formSteps[step - 1].title}</p>
-
-      {step === 1 && (
-        <div className="space-y-4 animate-fadeInUp">
-          <input
-            type="text" placeholder="שם מלא" aria-label="שם מלא" name="fullName" id="fullName" autoComplete="name" value={form.fullName}
-            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-right"
-          />
-          <input
-            type="tel" placeholder="טלפון" aria-label="מספר טלפון" name="phone" id="phone" autoComplete="tel" value={form.phone} dir="ltr"
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-left"
-          />
-          <button onClick={() => setStep(2)} disabled={!form.fullName || !form.phone}
-            className="w-full py-3 bg-[var(--gold)] text-white font-bold rounded-xl hover:bg-[var(--gold-dark)] transition disabled:opacity-40 disabled:cursor-not-allowed">
-            המשך <ChevronRight className="inline w-4 h-4 mr-1 rotate-180" />
-          </button>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="space-y-3 animate-fadeInUp">
-          {C.insuranceTypes.map((t) => (
-            <button key={t} onClick={() => { setForm({ ...form, insuranceType: t }); setStep(3); }}
-              className={`w-full px-4 py-3 text-right border-2 rounded-xl transition ${
-                form.insuranceType === t ? "border-[var(--gold)] bg-[var(--gold)]/5 font-bold" : "border-gray-200 hover:border-[var(--gold)]/50"
-              }`}>{t}</button>
-          ))}
-        </div>
-      )}
-
-      {step === 3 && (
-        <div className="space-y-4 animate-fadeInUp">
-          <textarea
-            placeholder="הערות נוספות (לא חובה)" aria-label="הערות נוספות" name="notes" id="notes" value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[var(--gold)] focus:outline-none transition text-right h-28 resize-none"
-          />
-          <button onClick={handleSubmit} disabled={loading}
-            className="w-full py-4 bg-gradient-to-l from-[var(--gold)] to-[var(--gold-light)] text-white font-bold rounded-xl hover:shadow-lg transition text-lg animate-pulseGold">
-            {loading ? "שולח..." : "שליחה — בדיקת תיק חינם"}
-            <Send className="inline w-5 h-5 mr-2" />
-          </button>
-          <button onClick={() => setStep(2)} className="w-full text-sm text-gray-400 hover:text-gray-600">חזרה</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ═══════════════════════ MAIN PAGE ═══════════════════════ */
-export default function HomePage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  useReveal();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const navLinks = [
+    { label: 'אודות', href: '#why' },
+    { label: 'התהליך', href: '#process' },
+    { label: 'מחשבון', href: '#calculator' },
+    { label: 'שאלות', href: '#faq' },
+    { label: 'צור קשר', href: '#contact' },
+  ];
 
   return (
     <>
-      {/* Skip Navigation */}
-      <a href="#form" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:right-4 focus:z-[100] focus:bg-[var(--gold)] focus:text-white focus:px-4 focus:py-3 focus:rounded-lg focus:text-lg focus:shadow-lg">דלג לטופס</a>
+      <PageLoader />
 
-      {/* ─── Sticky Header ─── */}
-      <header className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/95 header-scrolled py-2" : "bg-transparent py-4"
-      }`}>
-        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/yf-logo.svg" alt="יורם פרידמן" className="h-10 w-auto" />
-            <span className={`font-bold text-sm hidden sm:block transition-colors ${scrolled ? "text-[var(--navy)]" : "text-white"}`}>
-              יורם פרידמן | סוכנות לביטוח
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href={"tel:" + C.phone} aria-label="התקשר עכשיו" className={`hidden sm:flex items-center gap-1 text-sm font-medium min-h-[44px] transition-colors ${scrolled ? "text-[var(--navy)]" : "text-white"}`}>
-              <Phone className="w-4 h-4" /> {C.phone}
-            </a>
-            <a href="#form" className="bg-[var(--gold)] text-white px-5 py-3 min-h-[44px] rounded-full text-sm font-bold hover:bg-[var(--gold-dark)] transition shadow-md">
-              בדיקה חינם
-            </a>
-          </div>
+      {/* ─── Skip Nav ─── */}
+      <a href="#main-content" className="skip-nav">דלג לתוכן הראשי</a>
+
+      {/* ═══ HEADER ═══ */}
+      <header className={`site-header ${headerScrolled ? 'scrolled' : ''}`} role="banner">
+        <div className="header-inner">
+          <a href="#hero" className="header-logo" aria-label="יורם פרידמן - דף הבית">
+            יורם פרידמן
+          </a>
+          <nav className="header-nav" aria-label="ניווט ראשי">
+            {navLinks.map(l => (
+              <a key={l.href} href={l.href} className="nav-link">{l.label}</a>
+            ))}
+          </nav>
+          <a href={`tel:${c.phone}`} className="header-cta btn-gold" aria-label={`התקשר: ${c.phone}`}>
+            <Phone size={16} /> {c.phone}
+          </a>
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenu(!mobileMenu)}
+            aria-label="תפריט"
+            aria-expanded={mobileMenu}
+          >
+            <span className={`hamburger ${mobileMenu ? 'open' : ''}`} />
+          </button>
         </div>
+        {/* Mobile menu */}
+        {mobileMenu && (
+          <div className="mobile-nav">
+            {navLinks.map(l => (
+              <a key={l.href} href={l.href} className="mobile-nav-link" onClick={() => setMobileMenu(false)}>{l.label}</a>
+            ))}
+            <a href={`tel:${c.phone}`} className="btn-gold mobile-nav-cta">
+              <Phone size={16} /> {c.phone}
+            </a>
+          </div>
+        )}
       </header>
 
-      {/* ─── Hero ─── */}
-      <section className="relative min-h-[100vh] flex items-center overflow-hidden bg-gradient-to-bl from-[var(--navy-dark)] via-[var(--navy)] to-[var(--navy-light)]">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[var(--gold)] rounded-full blur-[120px]" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400 rounded-full blur-[150px]" />
-        </div>
-        <div className="max-w-6xl mx-auto px-4 py-32 relative z-10 text-center">
-          <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-8 animate-fadeInUp">
-            <span className="text-white/90 text-sm">✦ למעלה מ-40 שנות ניסיון מקצועי ✦</span>
+      <main id="main-content">
+        {/* ═══ HERO ═══ */}
+        <section id="hero" className="hero-section" aria-label="ראשי">
+          <ParticleCanvas />
+          <div className="hero-bg-glow" aria-hidden="true" />
+          <div className={`hero-content ${heroVisible ? 'visible' : ''}`}>
+            <div className="section-tag hero-tag">סוכן ביטוח מורשה · רישיון {c.licenseNumber}</div>
+            <h1 className="hero-title">
+              <span className="hero-title-line">בדיקת תיק פיננסי</span>
+              <span className="hero-title-line shimmer-text">ללא עלות</span>
+            </h1>
+            <p className="hero-subtitle">
+              {c.stats?.experience || '40'}+ שנות ניסיון בביטוח חיים, פנסיה, משכנתאות וחיסכון.
+              <br />בדיקה מקצועית שיכולה לחסוך לך אלפי שקלים בשנה.
+            </p>
+            <div className="hero-buttons">
+              <a href="#contact" className="btn-gold btn-lg">
+                קבע בדיקה חינם
+              </a>
+              <a href={`https://wa.me/${c.whatsappNumber}`} className="btn-outline btn-lg" target="_blank" rel="noopener noreferrer">
+                <MessageCircle size={20} /> וואטסאפ
+              </a>
+            </div>
           </div>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white leading-tight mb-6 animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
-            משלמים יותר מדי?
-            <br />
-            <span className="text-gold-gradient">זה הזמן לבדוק</span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-white/80 max-w-2xl mx-auto mb-10 animate-fadeInUp" style={{ animationDelay: "0.2s" }}>
-            {C.heroSubtext}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
-            <a href="#form" className="bg-[var(--gold)] text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-[var(--gold-dark)] transition shadow-xl hover:shadow-2xl hover:scale-105 animate-pulseGold">
-              בדיקת תיק חינם — ללא התחייבות
-            </a>
-            <a href={"https://wa.me/" + C.whatsappNumber} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-4 rounded-full text-lg font-bold hover:bg-[#20bd5a] transition shadow-xl">
-              <MessageCircle className="w-5 h-5" /> שליחת הודעה בוואטסאפ
-            </a>
-          </div>
-          <div className="mt-16 animate-fadeInUp" style={{ animationDelay: "0.5s" }}>
-            <ArrowDown className="w-6 h-6 text-white/40 mx-auto animate-float" />
-          </div>
-        </div>
-        {/* Diagonal cut */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-[var(--cream)]" style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0)" }} />
-      </section>
+        </section>
 
-      {/* ─── Partner Logo Strip ─── */}
-      <section className="py-8 bg-[var(--cream)] border-b border-gray-100">
-        <p className="text-center text-sm text-gray-400 mb-4">עובדים מול חברות הביטוח המובילות בישראל</p>
-        <div className="partner-strip overflow-hidden">
-          <div className="flex animate-marquee gap-12 items-center whitespace-nowrap">
-            {[...C.partnerCompanies, ...C.partnerCompanies].map((name, i) => (
-              <span key={i} className="text-gray-400 font-medium text-lg px-4">{name}</span>
+        {/* ═══ PARTNER MARQUEE ═══ */}
+        <div className="marquee-strip" aria-hidden="true">
+          <div className="marquee-track">
+            {[...c.partners, ...c.partners].map((p, i) => (
+              <span key={i} className="marquee-item">
+                <span className="marquee-dot" />
+                {p}
+              </span>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* ─── Stats ─── */}
-      <section className="py-20 bg-[var(--cream)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {C.stats.map((s, i) => (
-              <div key={i} className="reveal text-center" style={{ transitionDelay: i * 0.1 + "s" }}>
-                <div className="w-16 h-16 rounded-2xl bg-[var(--navy)]/5 flex items-center justify-center mx-auto mb-4">
-                  <Icon name={s.icon} className="w-8 h-8 text-[var(--gold)]" />
-                </div>
-                <div className="text-4xl sm:text-5xl font-black text-[var(--navy)] font-[var(--font-rubik)]">
-                  <Counter target={s.value} suffix={s.suffix} />
-                </div>
-                <p className="text-gray-600 mt-2 text-sm">{s.label}</p>
+        {/* ═══ STATS ═══ */}
+        <section className="stats-section" ref={revStats} aria-label="נתונים">
+          <div className="stats-grid">
+            {c.stats && [
+              { end: parseInt(c.stats.experience) || 40, suffix: '+', label: 'שנות ניסיון' },
+              { end: parseInt(c.stats.clients) || 5000, suffix: '+', label: 'לקוחות מרוצים' },
+              { end: parseInt(c.stats.savings) || 15, suffix: '%', label: 'חיסכון ממוצע' },
+              { end: parseInt(c.stats.products) || 200, suffix: '+', label: 'מוצרים פיננסיים' },
+            ].map((s, i) => (
+              <div key={i} className="stat-card">
+                <Counter end={s.end} suffix={s.suffix} />
+                <span className="stat-label">{s.label}</span>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── Why Yoram (Differentiators) ─── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16 reveal">
-            <h2 className="text-4xl font-black text-[var(--navy)] mb-4">למה דווקא יורם?</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">40 שנה של ניסיון, אובייקטיביות מלאה, ושירות אישי שלא תמצאו בשום מקום אחר</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {C.differentiators.map((d, i) => (
-              <div key={i} className="reveal group p-6 rounded-2xl border-2 border-gray-100 hover:border-[var(--gold)]/30 hover:shadow-lg transition-all duration-300" style={{ transitionDelay: i * 0.08 + "s" }}>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--gold)]/10 to-[var(--gold)]/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Icon name={d.icon} className="w-6 h-6 text-[var(--gold)]" />
-                </div>
-                <h3 className="text-lg font-bold text-[var(--navy)] mb-2">{d.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{d.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── How It Works (5-step timeline) ─── */}
-      <section className="py-24 bg-gradient-to-b from-[var(--cream)] to-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-16 reveal">
-            <h2 className="text-4xl font-black text-[var(--navy)] mb-4">איך זה עובד?</h2>
-            <p className="text-gray-600">תהליך פשוט וברור — מהפנייה הראשונה ועד ליווי שוטף</p>
-          </div>
-          <div className="space-y-0">
-            {C.steps.map((s, i) => (
-              <div key={i} className="reveal flex gap-6 items-start" style={{ transitionDelay: i * 0.1 + "s" }}>
-                <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[var(--navy)] text-white flex items-center justify-center font-bold text-lg shadow-lg">
-                    <Icon name={s.icon} className="w-6 h-6" />
+        {/* ═══ WHY YORAM ═══ */}
+        <section id="why" className="section-dark" ref={revWhy} aria-labelledby="why-title">
+          <div className="section-inner">
+            <div className="section-tag">למה יורם פרידמן</div>
+            <h2 id="why-title" className="section-title">היתרונות <span className="shimmer-text">שלנו</span></h2>
+            <div className="cards-grid">
+              {c.differentiators.map((d, i) => (
+                <div key={i} className="glass-card" style={{ animationDelay: `${i * 0.08}s` }}>
+                  <div className="card-icon">
+                    {iconMap[d.icon] || <Shield size={28} />}
                   </div>
-                  {i < C.steps.length - 1 && <div className="w-0.5 h-16 bg-[var(--gold)]/30 mt-2" />}
+                  <h3 className="card-title">{d.title}</h3>
+                  <p className="card-desc">{d.description}</p>
                 </div>
-                <div className="pb-12">
-                  <span className="text-xs font-bold text-[var(--gold)] uppercase tracking-wider">שלב {s.num}</span>
-                  <h3 className="text-xl font-bold text-[var(--navy)] mt-1">{s.title}</h3>
-                  <p className="text-gray-600 mt-1">{s.desc}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ PROCESS ═══ */}
+        <section id="process" className="section-deep" ref={revProcess} aria-labelledby="process-title">
+          <div className="section-inner">
+            <div className="section-tag">איך זה עובד</div>
+            <h2 id="process-title" className="section-title">התהליך <span className="shimmer-text">שלנו</span></h2>
+            <div className="process-steps">
+              {c.processSteps.map((step, i) => (
+                <div key={i} className="process-step">
+                  <div className="step-number">{String(i + 1).padStart(2, '0')}</div>
+                  <div className="step-content">
+                    <h3 className="step-title">{step.title}</h3>
+                    <p className="step-desc">{step.description}</p>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ CALCULATOR ═══ */}
+        <section id="calculator" className="section-dark" ref={revCalc} aria-labelledby="calc-title">
+          <div className="section-inner">
+            <div className="section-tag">מחשבון חיסכון</div>
+            <h2 id="calc-title" className="section-title">כמה אתה יכול <span className="shimmer-text">לחסוך?</span></h2>
+            <div className="calc-card">
+              <div className="calc-inputs">
+                <div className="calc-field">
+                  <label htmlFor="calc-age">גיל נוכחי: <strong>{calcAge}</strong></label>
+                  <input
+                    id="calc-age"
+                    type="range"
+                    min={25}
+                    max={60}
+                    value={calcAge}
+                    onChange={e => setCalcAge(Number(e.target.value))}
+                    className="calc-range"
+                    aria-label="גיל נוכחי"
+                  />
+                  <div className="range-labels"><span>25</span><span>60</span></div>
+                </div>
+                <div className="calc-field">
+                  <label htmlFor="calc-savings">חיסכון נוכחי: <strong>₪{calcSavings.toLocaleString()}</strong></label>
+                  <input
+                    id="calc-savings"
+                    type="range"
+                    min={50000}
+                    max={3000000}
+                    step={50000}
+                    value={calcSavings}
+                    onChange={e => setCalcSavings(Number(e.target.value))}
+                    className="calc-range"
+                    aria-label="חיסכון נוכחי"
+                  />
+                  <div className="range-labels"><span>₪50,000</span><span>₪3,000,000</span></div>
+                </div>
+              </div>
+              <div className="calc-result">
+                <div className="calc-result-label">חיסכון פוטנציאלי עד גיל פרישה</div>
+                <div className="calc-result-value shimmer-text">₪{calcPotential.toLocaleString()}</div>
+                <a href="#contact" className="btn-gold">רוצה לבדוק? צור קשר</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ FAQ ═══ */}
+        <section id="faq" className="section-deep" ref={revFaq} aria-labelledby="faq-title">
+          <div className="section-inner section-narrow">
+            <div className="section-tag">שאלות נפוצות</div>
+            <h2 id="faq-title" className="section-title">שאלות <span className="shimmer-text">ותשובות</span></h2>
+            <div className="faq-list" role="list">
+              {c.faqs.map((faq, i) => (
+                <div key={i} className={`faq-item ${faqOpen === i ? 'open' : ''}`} role="listitem">
+                  <button
+                    className="faq-question"
+                    onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                    aria-expanded={faqOpen === i}
+                    aria-controls={`faq-answer-${i}`}
+                  >
+                    <span>{faq.question}</span>
+                    <ChevronDown size={20} className="faq-chevron" />
+                  </button>
+                  <div
+                    id={`faq-answer-${i}`}
+                    className="faq-answer"
+                    role="region"
+                    aria-hidden={faqOpen !== i}
+                  >
+                    <p>{faq.answer}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ LEAD FORM ═══ */}
+        <section id="contact" className="section-dark" ref={revForm} aria-labelledby="form-title">
+          <div className="section-inner section-narrow">
+            <div className="section-tag">צור קשר</div>
+            <h2 id="form-title" className="section-title">קבע בדיקה <span className="shimmer-text">חינם</span></h2>
+
+            {formSuccess ? (
+              <div className="form-success">
+                <CheckCircle2 size={48} />
+                <h3>הפרטים נקלטו בהצלחה!</h3>
+                <p>נחזור אליך תוך 24 שעות עם תוצאות הבדיקה</p>
+              </div>
+            ) : (
+              <div className="lead-form-card">
+                {/* Progress dots */}
+                <div className="form-progress">
+                  {[0, 1, 2].map(s => (
+                    <div key={s} className={`progress-dot ${formStep >= s ? 'active' : ''} ${formStep === s ? 'current' : ''}`} />
+                  ))}
+                </div>
+
+                {formStep === 0 && (
+                  <div className="form-step">
+                    <h3 className="form-step-title">פרטים אישיים</h3>
+                    <div className="form-fields">
+                      <div className="form-field">
+                        <label htmlFor="f-name">שם מלא</label>
+                        <input id="f-name" type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="השם שלך" />
+                      </div>
+                      <div className="form-field">
+                        <label htmlFor="f-phone">טלפון</label>
+                        <input id="f-phone" type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="050-0000000" dir="ltr" />
+                      </div>
+                      <div className="form-field">
+                        <label htmlFor="f-email">אימייל (אופציונלי)</label>
+                        <input id="f-email" type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="email@example.com" dir="ltr" />
+                      </div>
+                    </div>
+                    <button className="btn-gold btn-full" onClick={() => setFormStep(1)} disabled={!formData.name || !formData.phone}>
+                      המשך <ChevronLeft size={18} />
+                    </button>
+                  </div>
+                )}
+
+                {formStep === 1 && (
+                  <div className="form-step">
+                    <h3 className="form-step-title">תחומי עניין</h3>
+                    <div className="insurance-chips">
+                      {insuranceTypes.map(type => (
+                        <button
+                          key={type}
+                          className={`chip ${formData.insuranceTypes.includes(type) ? 'active' : ''}`}
+                          onClick={() => toggleInsurance(type)}
+                          type="button"
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="form-nav-row">
+                      <button className="btn-outline" onClick={() => setFormStep(0)}>
+                        <ChevronRight size={18} /> חזור
+                      </button>
+                      <button className="btn-gold" onClick={() => setFormStep(2)}>
+                        המשך <ChevronLeft size={18} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {formStep === 2 && (
+                  <div className="form-step">
+                    <h3 className="form-step-title">הערות נוספות</h3>
+                    <div className="form-fields">
+                      <div className="form-field">
+                        <label htmlFor="f-msg">הודעה (אופציונלי)</label>
+                        <textarea id="f-msg" rows={3} value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} placeholder="ספר לנו במה נוכל לעזור..." />
+                      </div>
+                    </div>
+                    <div className="form-nav-row">
+                      <button className="btn-outline" onClick={() => setFormStep(1)}>
+                        <ChevronRight size={18} /> חזור
+                      </button>
+                      <button className="btn-gold" onClick={submitForm} disabled={formSubmitting}>
+                        <Send size={18} /> {formSubmitting ? 'שולח...' : 'שלח בקשה'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ═══ CREDENTIALS ═══ */}
+        <section className="credentials-section" ref={revCreds} aria-label="הסמכות">
+          <div className="credentials-row">
+            {c.credentials.map((cr, i) => (
+              <div key={i} className="credential-badge">
+                <BadgeCheck size={20} />
+                <span>{cr}</span>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── Savings Calculator ─── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 reveal">
-          <SavingsCalc />
-        </div>
-      </section>
-
-      {/* ─── FAQ Accordion ─── */}
-      <section className="py-24 bg-[var(--cream)]">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center mb-12 reveal">
-            <h2 className="text-4xl font-black text-[var(--navy)] mb-4">שאלות נפוצות</h2>
-          </div>
-          <div className="space-y-3">
-            {C.faq.map((item, i) => (
-              <details key={i} className="reveal group bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ transitionDelay: i * 0.05 + "s" }}>
-                <summary className="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition">
-                  <span className="font-bold text-[var(--navy)] text-right">{item.q}</span>
-                  <ChevronDown className="faq-chevron w-5 h-5 text-[var(--gold)] flex-shrink-0 mr-4 transition-transform duration-300" />
-                </summary>
-                <div className="faq-answer px-5 pb-5 text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
-                  {item.a}
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Lead Form ─── */}
-      <section id="form" className="py-24 bg-gradient-to-b from-white to-[var(--cream)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12 reveal">
-            <h2 className="text-4xl font-black text-[var(--navy)] mb-4">בדיקת תיק ביטוח — חינם</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">השאירו פרטים ויורם יחזור אליכם תוך מספר שעות. ללא התחייבות, ללא לחץ.</p>
-          </div>
-          <div className="reveal">
-            <LeadForm />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Credentials ─── */}
-      <section className="py-20 bg-[var(--navy)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12 reveal">
-            <h2 className="text-3xl font-black text-white mb-2">הכישורים שלנו</h2>
-            <p className="text-white/60">רישיון מקצועי, ניסיון עשיר, ואובייקטיביות מלאה</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {C.credentials.map((c, i) => (
-              <div key={i} className="reveal text-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition" style={{ transitionDelay: i * 0.1 + "s" }}>
-                <Icon name={c.icon} className="w-8 h-8 text-[var(--gold)] mx-auto mb-3" />
-                <h3 className="text-white font-bold mb-1">{c.label}</h3>
-                <p className="text-white/60 text-sm">{c.detail}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Final CTA ─── */}
-      <section className="py-20 bg-gradient-to-l from-[var(--gold)] to-[var(--gold-light)]">
-        <div className="max-w-4xl mx-auto px-4 text-center reveal">
-          <h2 className="text-4xl font-black text-white mb-4">מוכנים לגלות כמה אפשר לחסוך?</h2>
-          <p className="text-white/90 text-xl mb-8">בדיקת תיק ביטוח חינם — ללא התחייבות, ללא לחץ</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#form" className="bg-white text-[var(--navy)] px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl transition hover:scale-105">
-              בדיקה חינם עכשיו
-            </a>
-            <a href={"tel:" + C.phone} className="flex items-center gap-2 text-white border-2 border-white/40 px-6 py-4 rounded-full font-bold hover:bg-white/10 transition">
-              <Phone className="w-5 h-5" /> {C.phone}
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Footer ─── */}
-      <footer className="py-12 bg-[var(--navy-dark)] text-white/60">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="text-center sm:text-right">
-              <img src="/yf-logo.svg" alt="יורם פרידמן" className="h-8 w-auto mx-auto sm:mx-0 mb-2" />
-              <p className="text-sm">יורם פרידמן — סוכנות לביטוח | מאז 1984</p>
-              <p className="text-xs mt-1">רישיון סוכן ביטוח מס׳ {C.licenseNumber}</p>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href={"tel:" + C.phone} className="flex items-center gap-1 hover:text-white transition min-h-[44px] py-2"><Phone className="w-4 h-4" /> {C.phone}</a>
-              <a href={"mailto:" + C.email} className="flex items-center gap-1 hover:text-white transition min-h-[44px] py-2"><Mail className="w-4 h-4" /> {C.email}</a>
+        {/* ═══ FINAL CTA ═══ */}
+        <section className="cta-section" ref={revCta} aria-labelledby="cta-title">
+          <div className="cta-bg-pulse" aria-hidden="true" />
+          <div className="cta-content">
+            <h2 id="cta-title" className="cta-title">מוכן לגלות כמה אתה <span className="shimmer-text">יכול לחסוך?</span></h2>
+            <p className="cta-subtitle">בדיקת תיק ביטוח מקצועית ללא עלות וללא התחייבות</p>
+            <div className="cta-buttons">
+              <a href="#contact" className="btn-gold btn-lg">קבע בדיקה חינם</a>
+              <a href={`tel:${c.phone}`} className="btn-outline btn-lg">
+                <Phone size={20} /> {c.phone}
+              </a>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-8 pt-6 text-center text-xs text-white/40">
-            © {new Date().getFullYear()} {C.businessName}. כל הזכויות שמורות.
+        </section>
+      </main>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="site-footer" role="contentinfo">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <span className="footer-logo">יורם פרידמן</span>
+            <span className="footer-license">סוכן ביטוח מורשה · רישיון מס׳ {c.licenseNumber}</span>
+          </div>
+          <div className="footer-contact">
+            <a href={`tel:${c.phone}`}><Phone size={14} /> {c.phone}</a>
+            <a href={`https://wa.me/${c.whatsappNumber}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={14} /> וואטסאפ</a>
+          </div>
+          <div className="footer-copy">
+            © {new Date().getFullYear()} יורם פרידמן — כל הזכויות שמורות
           </div>
         </div>
       </footer>
 
-      {/* ─── WhatsApp FAB ─── */}
-      <a href={"https://wa.me/" + C.whatsappNumber + "?text=" + encodeURIComponent("שלום, קוראים לי ________. אשמח לבדיקת תיק ביטוח חינם.")}
-        target="_blank" rel="noopener noreferrer"
-        className="fixed bottom-6 left-6 z-50 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform animate-whatsappPulse"
-        aria-label="שליחת הודעה בוואטסאפ">
-        <MessageCircle className="w-8 h-8" />
+      {/* ═══ WhatsApp FAB ═══ */}
+      <a
+        href={`https://wa.me/${c.whatsappNumber}`}
+        className="whatsapp-fab"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="שלח הודעת וואטסאפ"
+      >
+        <MessageCircle size={28} />
       </a>
-
-      {/* ─── FAQ Schema (JSON-LD) ─── */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: C.faq.map((f) => ({
-          "@type": "Question", name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      })}} />
     </>
   );
 }
