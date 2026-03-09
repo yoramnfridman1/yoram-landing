@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, source } = body;
+    const { name, phone, email, insuranceTypes, message } = body;
 
     if (!name || !phone) {
       return NextResponse.json(
@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
     const lead = {
       name: name.trim(),
       phone: phoneClean,
-      source: source || "landing_page",
+      email: email || "",
+      insuranceTypes: insuranceTypes || [],
+      message: message || "",
+      source: "landing_page",
       createdAt: new Date().toISOString(),
       ip:
         req.headers.get("x-forwarded-for") ||
@@ -42,18 +45,26 @@ export async function POST(req: NextRequest) {
     // Send WhatsApp notification via WAHA
     const wahaUrl = process.env.WAHA_URL || "http://172.245.56.50:3000";
     const wahaKey = process.env.WAHA_API_KEY;
-    const notifyChat = process.env.LEAD_NOTIFY_CHAT || "972544969668@c.us";
+    const notifyChat = process.env.LEAD_NOTIFY_CHAT || "972522422274@c.us";
     const wahaSession = process.env.WAHA_SESSION || "superseller-whatsapp";
 
     if (wahaKey) {
+      const insuranceStr = Array.isArray(lead.insuranceTypes) && lead.insuranceTypes.length > 0
+        ? lead.insuranceTypes.join(", ")
+        : "לא צוין";
+
       const msg = [
-        "\ud83d\udd14 \u05dc\u05d9\u05d3 \u05d7\u05d3\u05e9 - \u05d9\u05d5\u05e8\u05dd \u05e4\u05e8\u05d9\u05d3\u05de\u05df",
+        "\ud83d\udd14 ליד חדש - יורם פרידמן",
         "",
-        `\u05e9\u05dd: ${lead.name}`,
-        `\u05d8\u05dc\u05e4\u05d5\u05df: ${lead.phone}`,
-        `\u05de\u05e7\u05d5\u05e8: ${lead.source}`,
-        `\u05ea\u05d0\u05e8\u05d9\u05da: ${lead.createdAt}`,
-      ].join("\n");
+        `שם: ${lead.name}`,
+        `טלפון: ${lead.phone}`,
+        `אימייל: ${lead.email || "לא צוין"}`,
+        `תחומי עניין: ${insuranceStr}`,
+        lead.message ? `הערות: ${lead.message}` : "",
+        "",
+        `מקור: ${lead.source}`,
+        `תאריך: ${new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}`,
+      ].filter(Boolean).join("\n");
 
       try {
         await fetch(`${wahaUrl}/api/sendText`, {
