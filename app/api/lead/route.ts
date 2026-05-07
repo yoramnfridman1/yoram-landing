@@ -1,90 +1,90 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Forwards lead form submissions to the SuperSeller worker, which handles
+ * DB persistence, agent-template formatting, and WA notification to Yoram's
+ * review group (so the AI agent can see and act via mark_lead_status).
+ *
+ * The page form posts here client-side; this server-side handler holds the
+ * shared secret in a Vercel env var and re-validates phone before forwarding.
+ * If the worker is unreachable, we fall back to a direct WAHA notify so leads
+ * are never silently dropped.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { name, phone, email, insuranceTypes, message } = body;
 
     if (!name || !phone) {
-      return NextResponse.json(
-        { error: "name and phone are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "name and phone are required" }, { status: 400 });
     }
-
-    const phoneClean = phone.replace(/[\s\-()]/g, "");
+    const phoneClean = String(phone).replace(/[\s\-()]/g, "");
     const isValid =
       /^0[2-9]\d{7,8}$/.test(phoneClean) ||
       /^05\d{8}$/.test(phoneClean) ||
       /^\+972\d{8,9}$/.test(phoneClean);
-
     if (!isValid) {
-      return NextResponse.json(
-        { error: "invalid phone number" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "invalid phone number" }, { status: 400 });
     }
 
-    const lead = {
-      name: name.trim(),
-      phone: phoneClean,
-      email: email || "",
-      insuranceTypes: insuranceTypes || [],
-      message: message || "",
-      source: "landing_page",
-      createdAt: new Date().toISOString(),
-      ip:
-        req.headers.get("x-forwarded-for") ||
-        req.headers.get("x-real-ip") ||
-        "unknown",
-      ua: req.headers.get("user-agent") || "unknown",
-    };
+    const workerUrl = process.env.WORKER_LEAD_URL;
+    const workerSecret = process.env.WORKER_API_SECRET;
 
-    console.log("[LEAD]", JSON.stringify(lead));
+    if (workerUrl && workerSecret) {
+      try {
+        const fwd = await fetch(workerUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Worker-Secret": workerSecret,
+          },
+          body: JSON.stringify({
+            name: String(name).trim(),
+            phone: phoneClean,
+            email: email || "",
+            insuranceTypes: Array.isArray(insuranceTypes) ? insuranceTypes : [],
+            message: message || "",
+            source: "yoramfriedman.co.il",
+          }),
+        });
+        if (fwd.ok) {
+          const j = await fwd.json();
+          return NextResponse.json({ ok: true, leadId: j.leadIdPrefix }, { status: 201 });
+        }
+        console.error("[LEAD WORKER ERROR]", fwd.status, await fwd.text().catch(() => ""));
+      } catch (err) {
+        console.error("[LEAD WORKER FETCH ERROR]", err);
+      }
+    }
 
-    // Send WhatsApp notification via WAHA
+    // Fallback: direct WAHA notify so the lead is never silently lost.
     const wahaUrl = process.env.WAHA_URL || "http://172.245.56.50:3000";
     const wahaKey = process.env.WAHA_API_KEY;
     const notifyChat = process.env.LEAD_NOTIFY_CHAT || "972522422274@c.us";
     const wahaSession = process.env.WAHA_SESSION || "superseller-whatsapp";
-
     if (wahaKey) {
-      const insuranceStr = Array.isArray(lead.insuranceTypes) && lead.insuranceTypes.length > 0
-        ? lead.insuranceTypes.join(", ")
-        : "לא צוין";
-
-      const msg = [
-        "\ud83d\udd14 ליד חדש - יורם פרידמן",
+      const insuranceStr = Array.isArray(insuranceTypes) && insuranceTypes.length > 0 ? insuranceTypes.join(", ") : "לא צוין";
+      const fallbackMsg = [
+        "🔔 ליד חדש (fallback - worker unreachable)",
         "",
-        `שם: ${lead.name}`,
-        `טלפון: ${lead.phone}`,
-        `אימייל: ${lead.email || "לא צוין"}`,
+        `שם: ${String(name).trim()}`,
+        `טלפון: ${phoneClean}`,
+        `אימייל: ${email || "לא צוין"}`,
         `תחומי עניין: ${insuranceStr}`,
-        lead.message ? `הערות: ${lead.message}` : "",
-        "",
-        `מקור: ${lead.source}`,
-        `תאריך: ${new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}`,
+        message ? `הערות: ${message}` : "",
       ].filter(Boolean).join("\n");
-
       try {
         await fetch(`${wahaUrl}/api/sendText`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": wahaKey,
-          },
-          body: JSON.stringify({
-            chatId: notifyChat,
-            text: msg,
-            session: wahaSession,
-          }),
+          headers: { "Content-Type": "application/json", "X-Api-Key": wahaKey },
+          body: JSON.stringify({ chatId: notifyChat, text: fallbackMsg, session: wahaSession }),
         });
-      } catch (wahaErr) {
-        console.error("[LEAD WAHA ERROR]", wahaErr);
+      } catch (e) {
+        console.error("[LEAD FALLBACK WAHA ERROR]", e);
       }
     }
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json({ ok: true, fallback: true }, { status: 201 });
   } catch (err) {
     console.error("[LEAD ERROR]", err);
     return NextResponse.json({ error: "server error" }, { status: 500 });
