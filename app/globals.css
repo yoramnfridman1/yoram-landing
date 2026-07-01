@@ -937,6 +937,13 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.9rem;
   color: var(--gray);
 }
+.form-error {
+  margin-top: 1rem;
+  color: #ffb4b4;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
 
 /* ── CREDENTIALS ── */
 .credentials-section {

@@ -231,6 +231,7 @@ export default function HomePage() {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', insuranceTypes: [] as string[], message: '' });
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const insuranceTypes = c.insuranceTypes || ['ביטוח חיים', 'פנסיה', 'משכנתא', 'חיסכון', 'ביטוח בריאות'];
 
@@ -245,14 +246,18 @@ export default function HomePage() {
 
   const submitForm = async () => {
     setFormSubmitting(true);
+    setFormError('');
     try {
-      await fetch('/api/lead', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+      if (!res.ok) throw new Error('lead_failed');
       setFormSuccess(true);
-    } catch { setFormSuccess(true); }
+    } catch {
+      setFormError('השליחה נכשלה. אפשר לנסות שוב או לשלוח הודעת וואטסאפ ליורם.');
+    }
     setFormSubmitting(false);
   };
 
@@ -559,6 +564,7 @@ export default function HomePage() {
                         <Send size={18} /> {formSubmitting ? 'שולח...' : 'שלח בקשה'}
                       </button>
                     </div>
+                    {formError && <p className="form-error" role="alert">{formError}</p>}
                   </div>
                 )}
               </div>
